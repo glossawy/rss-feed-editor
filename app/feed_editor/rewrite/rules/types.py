@@ -36,11 +36,11 @@ class MutationDictWithXPath(MutationDictWithoutXPath):
     xpath: str
 
 
-MutationDict = MutationDictWithoutXPath | MutationDictWithXPath
+MutationDict = MutationDictWithXPath | MutationDictWithoutXPath
 
 
 class RuleDict(TypedDict):
-    conditions: ConditionDict
+    condition: ConditionDict
     mutations: list[MutationDict]
     xpath: str
 

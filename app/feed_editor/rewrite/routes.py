@@ -6,9 +6,10 @@ from typing import Mapping
 from flask import Blueprint, request
 
 from werkzeug.exceptions import BadRequest
+from app.feed_editor.utils.normalizers import normalize_xml
 
 from feed_editor.rewrite.rewriter import FeedRewriter
-from feed_editor.rewrite.rules import validate_dict
+from feed_editor.rewrite.rules import validate_dict, validate_xpaths
 from feed_editor.rewrite.rules.types import FeedRulesDict
 
 rewrite_api = Blueprint("rewrite", __name__, url_prefix="/rewrite")
@@ -21,7 +22,11 @@ def get():
     if not feed_rewriter.is_valid_feed:
         return "Feed URL must be a valid url", 400
 
-    return feed_rewriter.rewritten_feed.as_xml(), 200
+    return (
+        normalize_xml(feed_rewriter.rewritten_feed.as_xml()),
+        200,
+        {"Content-Type": feed_rewriter.mime_type},
+    )
 
 
 @rewrite_api.route("/url", methods=["POST"])
@@ -37,6 +42,10 @@ def url():
         return "Missing feed_url or rules", 400
 
     feed_dict = validate_dict(request_json)
+
+    if not validate_xpaths(feed_dict):
+        return "Invalid xpaths", 400
+
     return _url_encode_rules(feed_dict)
 
 

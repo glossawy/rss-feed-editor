@@ -1,5 +1,7 @@
 import copy
 import functools
+from typing import cast
+from anyio import Condition
 
 from pydantic.type_adapter import TypeAdapter
 
@@ -12,7 +14,41 @@ from .types import AndDict, ConditionDict, FeedRulesDict, MutationDict, OrDict, 
 from feed_editor.utils.dict_validation import validate_dict as generic_validate_dict
 from feed_editor.xpath import ns_aware_find, ns_aware_findall
 
-validate_dict = functools.partial(generic_validate_dict, FeedRulesDict)
+
+def validate_dict(test_dict: dict):
+    generic_validate_dict(FeedRulesDict, test_dict)
+    return cast(FeedRulesDict, test_dict)
+
+
+def validate_xpaths(feed_rules: FeedRulesDict) -> bool:
+    def is_valid_xpath(xpath: str) -> bool:
+        return xpath.strip() != ""
+
+    def validate_condition_paths(cond: ConditionDict) -> bool:
+        if "xpath" in cond:
+            return is_valid_xpath(cond["xpath"])
+        elif "all_of" in cond:
+            return all(
+                validate_condition_paths(sub_cond) for sub_cond in cond["all_of"]
+            )
+        elif "any_of" in cond:
+            return all(
+                validate_condition_paths(sub_cond) for sub_cond in cond["any_of"]
+            )
+        else:
+            return True
+
+    def validate_rule_xpaths(rule: RuleDict) -> bool:
+        return (
+            is_valid_xpath(rule["xpath"])
+            and validate_condition_paths(rule["condition"])
+            and all(
+                is_valid_xpath(mutation["xpath"]) if "xpath" in mutation else True
+                for mutation in rule["mutations"]
+            )
+        )
+
+    return all(validate_rule_xpaths(rule) for rule in feed_rules["rules"])
 
 
 def test_conditions_element(
@@ -75,7 +111,7 @@ def run_mutations_element(
 
 def run_rule(tree: etree._ElementTree, rule: RuleDict) -> None:
     for element in ns_aware_findall(tree, rule["xpath"]):
-        if test_conditions_element(element, rule["conditions"]):
+        if test_conditions_element(element, rule["condition"]):
             run_mutations_element(element, rule["mutations"])
 
 

@@ -1,13 +1,11 @@
 import functools
-from typing import Protocol, Type, Callable, ParamSpec
+from typing import Protocol, Callable, ParamSpec
 from typing_extensions import TypedDict
 import re
 
 from lxml import etree
 
 from feed_editor.utils.dict_validation import validate_typed_dict, _TypedDict_T
-
-_P = ParamSpec("_P")
 
 
 def _require_args(dict_type: type[_TypedDict_T]):
@@ -53,7 +51,7 @@ def _replace(element: etree._Element, args: ReplaceArgs, /):
     element.text = elem_text
 
 
-MutationArgs = RemoveArgs | ReplaceArgs
+MutationArgs = ReplaceArgs | RemoveArgs
 
 
 class MutationFn(Protocol):
@@ -65,7 +63,7 @@ class MutationFn(Protocol):
 class Mutation(TypedDict):
     display_name: str
     definition: MutationFn
-    arg_spec: Type[MutationArgs]
+    arg_spec: type[MutationArgs]
 
 
 mutation_list: list[Mutation] = [

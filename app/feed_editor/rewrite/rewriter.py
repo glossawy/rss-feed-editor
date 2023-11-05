@@ -2,11 +2,12 @@ import dataclasses
 from functools import cached_property
 from typing import cast
 
-import validators
-
-from feed_editor.rewrite.rules.types import FeedRulesDict
+import validators  # type: ignore
 from feed_editor.rewrite.rules import run_rule
-from feed_editor.rss.fetch import Feed, fetch_feed as rss_fetch
+from feed_editor.rewrite.rules.types import FeedRulesDict
+from feed_editor.rss.fetch import Feed
+from feed_editor.rss.fetch import fetch_feed as rss_fetch
+from feed_editor.rss.models import FeedType
 
 
 @dataclasses.dataclass
@@ -33,3 +34,13 @@ class FeedRewriter:
             run_rule(new_feed.tree, rule_dict)
 
         return new_feed
+
+    @property
+    def mime_type(self) -> str:
+        match self.feed.feed_type:
+            case FeedType.RSS:
+                return "application/rss+xml"
+            case FeedType.ATOM:
+                return "application/atom+xml"
+            case feed_type:
+                raise RuntimeError(f"No mime type known for {feed_type} feed")

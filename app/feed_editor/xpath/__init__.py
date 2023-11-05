@@ -8,8 +8,6 @@ _P = ParamSpec("_P")
 _Result_T = TypeVar("_Result_T")
 _NamespaceMap = Mapping[str, str]
 _ElementOrTree = etree._Element | etree._ElementTree
-NamespaceAwareFn = Callable[Concatenate[_ElementOrTree, _NamespaceMap, ...], _Result_T]
-NamespaceUnawareFn = Callable[Concatenate[_ElementOrTree, ...], _Result_T]
 
 
 def _normalize_tree_input(

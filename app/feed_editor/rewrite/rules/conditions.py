@@ -1,5 +1,5 @@
 import functools
-from typing import Protocol, Type, Callable
+from typing import Protocol, Callable
 from typing_extensions import TypedDict
 
 from feed_editor.utils.dict_validation import _TypedDict_T, validate_typed_dict
@@ -39,7 +39,7 @@ class ConditionFn(Protocol):
 class Condition(TypedDict):
     display_name: str
     definition: ConditionFn
-    arg_spec: Type[ConditionArgs]
+    arg_spec: type[ConditionArgs]
 
 
 all_conditions: list[Condition] = [
