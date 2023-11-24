@@ -1,147 +1,104 @@
-type ConditionBase = { xpath?: string }
+import { z } from "zod"
 
-export type Condition =
-  | { all_of: [Condition] }
-  | { any_of: [Condition] }
-  | (ConditionBase & { name: "contains"; args: { value: string } })
+const emptyObject = (errorMessage: string = "Expected empty object") => {
+  return z.custom<Record<string, never>>(
+    (data) => {
+      console.log(data)
 
-const conditionSchema = {
-  oneOf: [
-    // AllOf condition (AND)
-    {
-      type: "object",
-      properties: {
-        all_of: {
-          type: "array",
-          items: {
-            $ref: "#/$defs/condition",
-          },
-        },
-      },
-      additionalProperties: false,
+      if (typeof data === "object" && data != null) {
+        return Object.keys(data).length === 0
+      } else {
+        return false
+      }
     },
-    // AnyOf Condition (OR)
-    {
-      type: "object",
-      properties: {
-        any_of: {
-          type: "array",
-          items: {
-            $ref: "#/$defs/condition",
-          },
-        },
-      },
-      additionalProperties: false,
-    },
-    // Actual Condition
-    {
-      type: "object",
-      properties: {
-        xpath: {
-          type: "string",
-          nullable: true,
-        },
-        name: {
-          type: "string",
-          nullable: false,
-        },
-        args: {
-          type: "object",
-          additionalProperties: true,
-        },
-      },
-      required: ["name", "args"],
-      additionalProperties: false,
-    },
-  ],
+    { fatal: true, message: errorMessage }
+  )
 }
 
-type MutationBase = { xpath?: string }
-export type Mutation = MutationBase & {
-  name: "remove"
-  args: Record<string, never>
-}
+const XPathBase = z.object({
+  xpath: z
+    .string()
+    .regex(/\S+/, "Relative XPaths must not be blank")
+    .optional(),
+})
 
-const mutationSchema = {
-  type: "object",
-  properties: {
-    xpath: {
-      type: "string",
-      nullable: true,
-    },
-    name: {
-      type: "string",
-      nullable: false,
-    },
-    args: {
-      type: "object",
-      additionalProperties: true,
-    },
-  },
-  required: ["name", "args"],
-  additionalProperties: false,
-}
+/// CONDITIONS
 
-export type Rule = {
-  xpath: string
-  condition: Condition | Record<string, never>
-  mutations: Array<Mutation>
-}
+const ConditionBase = XPathBase
 
-const ruleSchema = {
-  type: "object",
-  properties: {
-    xpath: {
-      type: "string",
-      nullable: false,
-    },
-    condition: {
-      oneOf: [
-        {
-          $ref: "#/$defs/condition",
-        },
-        {
-          type: "object",
-          properties: {},
-          additionalProperties: false,
-        },
-      ],
-    },
-    mutations: {
-      type: "array",
-      items: {
-        $ref: "#/$defs/mutation",
-      },
-    },
-  },
-  additionalProperties: false,
-  required: ["xpath", "condition", "mutations"],
-}
+const ContainsCondition = ConditionBase.extend({
+  name: z.literal("contains"),
+  args: z.object({
+    value: z.string(),
+  }),
+})
 
-export type FeedTransform = {
-  feed_url: string
-  rules: Array<Rule>
-}
+const AllOfCondition: z.ZodType<{ all_of: Condition[] }> = z.object({
+  all_of: z.lazy(() => Condition.array()),
+})
 
-export const feedTransformSchema = {
-  type: "object",
-  properties: {
-    feed_url: {
-      type: "string",
-      nullable: false,
-    },
-    rules: {
-      type: "array",
-      items: {
-        $ref: "#/$defs/rule",
-      },
-    },
-  },
-  required: ["feed_url", "rules"],
-  additionalProperties: false,
-  $defs: {
-    rule: ruleSchema,
-    condition: conditionSchema,
-    mutation: mutationSchema,
-  },
+const AnyOfCondition: z.ZodType<{ any_of: Condition[] }> = z.object({
+  any_of: z.lazy(() => Condition.array()),
+})
+
+export const Condition = z.union([
+  AllOfCondition,
+  AnyOfCondition,
+  ContainsCondition,
+])
+export type Condition = z.infer<typeof Condition>
+
+/// MUTATIONS
+
+const MutationBase = XPathBase
+
+const RemoveMutation = MutationBase.extend({
+  name: z.literal("remove"),
+  args: emptyObject("Remove requires no arguments"),
+})
+
+const ReplaceMutation = MutationBase.extend({
+  name: z.literal("replace"),
+  args: z.object({
+    pattern: z.string(),
+    replacement: z.string(),
+    trim: z.boolean(),
+  }),
+})
+
+export const Mutation = z.union([RemoveMutation, ReplaceMutation])
+export type Mutation = z.infer<typeof Mutation>
+
+/// RULES / FEED TRANSFORM
+
+export const Rule = z.object({
+  xpath: z
+    .string()
+    .startsWith(
+      "/",
+      "Rule XPaths must start with '/' or '//', starting with '//channel' is recommended"
+    ),
+  condition: Condition,
+  mutations: Mutation.array(),
+})
+export type Rule = z.infer<typeof Rule>
+
+export const FeedTransform = z.object({
+  feed_url: z.string().url(),
+  rules: Rule.array(),
+})
+
+export type FeedTransform = z.infer<typeof FeedTransform>
+
+export function addToCondition(
+  initial: Condition,
+  summand: Condition
+): Condition {
+  if ("all_of" in initial) {
+    return { all_of: [...initial.all_of, summand] }
+  } else if ("any_of" in initial) {
+    return { any_of: [...initial.any_of, summand] }
+  } else {
+    return { any_of: [initial, summand] }
+  }
 }

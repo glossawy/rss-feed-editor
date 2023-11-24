@@ -1,4 +1,4 @@
-import { FeedTransform } from "./rules"
+import type { FeedTransform } from "./rules"
 
 function textFromResponse(response: Response) {
   if (response.ok) return response.text()

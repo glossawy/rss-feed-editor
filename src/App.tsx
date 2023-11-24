@@ -1,111 +1,112 @@
-import RulesEditor, { Action } from "./components/RulesEditor"
+import RulesEditor, { Action, JSONValue } from "./components/RulesEditor"
 import FeedDiff from "./components/FeedDiff"
 import RulesEditorForm, { FormValues } from "./components/RulesEditorForm"
 
-import { useEffect, useState } from "react"
-import {
-  Box,
-  Stack,
-  CssVarsProvider,
-  CssBaseline,
-  Typography,
-  Link,
-} from "@mui/joy"
+import { useCallback, useState } from "react"
+import { Stack, CssVarsProvider, CssBaseline, Typography, Link } from "@mui/joy"
 
-import type { FeedTransform, Rule } from "./utils/rules"
-import { FeedTransforms, Conditions, Mutations } from "./utils/factories"
+import { addToCondition, type FeedTransform, type Rule } from "./utils/rules"
+import { FeedTransforms } from "./utils/factories"
 import * as api from "./utils/api"
 
 function App() {
   const [feedUrl, setFeedUrl] = useState("")
-  const [rulesJson, setRulesJson] = useState<FeedTransform>(
+  const [feedRules, setFeedRules] = useState<FeedTransform>(
     FeedTransforms.empty()
   )
   const [encodedRules, setEncodedRules] = useState<string | null>(null)
 
-  function handleSubmit(formValues: FormValues) {
-    const { feedUrl } = formValues
+  const handleSubmit = useCallback(
+    (formValues: FormValues) => {
+      const { feedUrl } = formValues
 
-    setFeedUrl(feedUrl)
-    setRulesJson({ ...rulesJson, feed_url: feedUrl })
-  }
+      setFeedUrl(feedUrl)
+      setFeedRules({ ...feedRules, feed_url: feedUrl })
+    },
+    [feedRules]
+  )
 
-  function handleJsonUpdate(newTransform: FeedTransform) {
-    setRulesJson({ ...newTransform, feed_url: feedUrl })
-  }
+  const handleJsonUpdate = useCallback(
+    (json: JSONValue) => {
+      const newTransform = json as FeedTransform
+      const newFeedRules = { ...newTransform, feed_url: feedUrl }
 
-  function handleEditorAction(action: Action) {
-    const updateRule = (
-      index: number,
-      transform: (rule: Rule) => Rule
-    ): FeedTransform => {
-      const newRules = [...rulesJson.rules]
-      const rule = newRules[index]
+      setFeedRules(newFeedRules)
+      api.encodeRules(newFeedRules).then(setEncodedRules)
+    },
+    [feedUrl]
+  )
 
-      newRules[index] = transform(rule)
-      return { ...rulesJson, rules: newRules }
-    }
+  const handleEditorAction = useCallback(
+    (action: Action) => {
+      const updateRule = (
+        index: number,
+        transform: (rule: Rule) => Rule
+      ): FeedTransform => {
+        const newRules = [...feedRules.rules]
+        const rule = newRules[index]
 
-    switch (action.type) {
-      case "rule":
-        setRulesJson({
-          ...rulesJson,
-          rules: [
-            ...rulesJson.rules,
-            {
-              xpath: "//",
-              condition: Conditions.contains({ value: "" }),
-              mutations: [],
-            },
-          ],
-        })
-        break
-      case "mutation":
-        setRulesJson(
-          updateRule(action.index, (rule) => ({
-            ...rule,
-            mutations: [...rule.mutations, Mutations.remove({})],
-          }))
-        )
-        break
-      default:
-        break
-    }
-  }
+        newRules[index] = transform(rule)
+        return { ...feedRules, rules: newRules }
+      }
 
-  useEffect(() => {
-    if (rulesJson.feed_url === "") return
-
-    api.encodeRules(rulesJson).then(setEncodedRules)
-  }, [rulesJson])
+      switch (action.type) {
+        case "rule":
+          setFeedRules({
+            ...feedRules,
+            rules: [...feedRules.rules, action.rule],
+          })
+          break
+        case "mutation":
+          setFeedRules(
+            updateRule(action.index, (rule) => ({
+              ...rule,
+              mutations: [...rule.mutations, action.mutation],
+            }))
+          )
+          break
+        case "condition":
+          setFeedRules(
+            updateRule(action.index, (rule) => ({
+              ...rule,
+              condition: addToCondition(rule.condition, action.condition),
+            }))
+          )
+          break
+        default:
+          break
+      }
+    },
+    [feedRules]
+  )
 
   return (
     <CssVarsProvider>
       <CssBaseline />
-      <Stack sx={{ margin: 4 }}>
+      <Stack sx={{ margin: 4 }} spacing={2}>
         <RulesEditorForm onSubmit={handleSubmit} />
-        <Box id="rss-outputs" sx={{ paddingY: 2 }}>
+        <Stack id="rss-outputs" spacing={0}>
           <Typography level="title-sm">Transformed Feed URL</Typography>
-          <Link
-            href={`http://localhost:5000/rewrite/?r=${encodedRules}`}
-            level="body-sm"
-          >
-            http://localhost:5000/rewrite/?r={encodedRules}
-          </Link>
-        </Box>
-        <Stack spacing={2}>
+          {encodedRules ? (
+            <Link
+              href={`http://localhost:5000/rewrite/?r=${encodedRules}`}
+              level="body-sm"
+            >
+              http://localhost:5000/rewrite/?r={encodedRules}
+            </Link>
+          ) : (
+            <Typography level="body-sm">No valid rules yet</Typography>
+          )}
+        </Stack>
+        <Stack spacing={1}>
           <RulesEditor
             readOnly={encodedRules === null}
-            value={rulesJson}
+            value={feedRules}
             readOnlyKeys={["feed_url", "rules"]}
-            onChange={(json) => handleJsonUpdate(json as FeedTransform)}
+            onChange={handleJsonUpdate}
             onAction={handleEditorAction}
           />
-          <FeedDiff
-            key={feedUrl}
-            feedUrl={feedUrl}
-            encodedRules={encodedRules}
-          />
+          <FeedDiff feedUrl={feedUrl} encodedRules={encodedRules} />
         </Stack>
       </Stack>
     </CssVarsProvider>

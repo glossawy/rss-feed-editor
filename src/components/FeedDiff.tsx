@@ -15,26 +15,39 @@ export default function FeedDiff({ feedUrl, encodedRules }: Props) {
   const [transformedFeedContent, setTransformedFeedContent] = useState<
     string | null
   >(null)
-  const [isLoading, setIsLoading] = useState(true)
+
+  const [isLoadingSource, setIsLoadingSource] = useState(false)
+  const [isLoadingTransformed, setIsLoadingTransformed] = useState(false)
+
+  const isLoading = isLoadingSource || isLoadingTransformed
 
   useEffect(() => {
-    const asyncOp = async () => {
-      if (!feedUrl || !encodedRules) return
+    if (!feedUrl) return
 
-      const sourceFeed = await api.proxyUrl(feedUrl)
-      const transformedFeed = await api.getTransformedFeed(encodedRules)
+    setIsLoadingSource(true)
+    api
+      .proxyUrl(feedUrl)
+      .then(setSourceFeedContent)
+      .finally(() => {
+        setIsLoadingSource(false)
+      })
+  }, [feedUrl])
 
-      setIsLoading(false)
-      setSourceFeedContent(sourceFeed)
-      setTransformedFeedContent(transformedFeed)
-    }
+  useEffect(() => {
+    if (!encodedRules) return
 
-    asyncOp()
-  }, [feedUrl, encodedRules])
+    setIsLoadingTransformed(true)
+    api
+      .getTransformedFeed(encodedRules)
+      .then(setTransformedFeedContent)
+      .finally(() => {
+        setIsLoadingTransformed(false)
+      })
+  }, [encodedRules])
 
   const title = isLoading ? "Loading..." : feedUrl
-  const left = sourceFeedContent || ""
-  const right = transformedFeedContent || ""
+  const left = isLoading ? "" : sourceFeedContent || ""
+  const right = isLoading ? "" : transformedFeedContent || ""
 
   return (
     <Diff

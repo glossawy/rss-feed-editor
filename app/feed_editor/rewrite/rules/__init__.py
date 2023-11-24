@@ -110,6 +110,7 @@ def run_mutations_element(
 
 
 def run_rule(tree: etree._ElementTree, rule: RuleDict) -> None:
+    # pylint: disable=no-value-for-parameter
     for element in ns_aware_findall(tree, rule["xpath"]):
         if test_conditions_element(element, rule["condition"]):
             run_mutations_element(element, rule["mutations"])
@@ -127,4 +128,5 @@ def _resolve_and_find(root: etree._Element, xpath: str) -> etree._Element | None
     else:
         context_node = root
 
+    # pylint: disable=no-value-for-parameter
     return ns_aware_find(context_node, xpath)

@@ -1,4 +1,11 @@
-import { useRef, MutableRefObject, useEffect, useState } from "react"
+import {
+  useRef,
+  MutableRefObject,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+} from "react"
 
 import {
   JSONEditor as SvelteJSONEditor,
@@ -7,37 +14,39 @@ import {
   RenderValueProps,
   RenderValueComponentDescription,
   renderValue,
-  createAjvValidator,
   JSONEditorSelection,
   SelectionType,
   MenuItem,
 } from "svelte-jsoneditor"
 import useEffectOnce from "../utils/useEffectOnce"
 
-import { feedTransformSchema } from "../utils/rules"
+import { Condition, FeedTransform, Mutation, Rule } from "../utils/rules"
+import createZodValidator from "../utils/createZodValidator"
+import { Stack } from "@mui/joy"
+import RuleActions, { RuleAction } from "./RuleActions"
 
-declare type JSONPrimitive = string | number | boolean | null
-declare type JSONValue =
+export type JSONPrimitive = string | number | boolean | null
+export type JSONValue =
   | {
       [key: string]: JSONValue
     }
   | JSONValue[]
   | JSONPrimitive
-declare type JSONObject = {
+export type JSONObject = {
   [key: string]: JSONValue
 }
 
 export type Action =
-  | {
-      type: "rule"
-    }
+  | { type: "rule"; rule: Rule }
   | {
       type: "condition"
       index: number
+      condition: Condition
     }
   | {
       type: "mutation"
       index: number
+      mutation: Mutation
     }
 
 declare type EditorProps = {
@@ -48,9 +57,7 @@ declare type EditorProps = {
   onAction?: (action: Action) => void
 }
 
-const feedTransformValidator = createAjvValidator({
-  schema: feedTransformSchema,
-})
+const feedTransformValidator = createZodValidator(FeedTransform)
 
 export default function RulesEditor(props: EditorProps) {
   const refContainer: MutableRefObject<HTMLDivElement | null> = useRef(null)
@@ -59,7 +66,35 @@ export default function RulesEditor(props: EditorProps) {
 
   const [currentPath, setCurrentPath] = useState<string[]>([])
 
-  const isRulesSelected = currentPath.includes("rules")
+  const onAction = useMemo(() => props.onAction || (() => {}), [props.onAction])
+
+  const onRuleAction = useCallback(
+    (action: RuleAction) => {
+      const itemIndex = parseInt(currentPath[1])
+      switch (action.type) {
+        case "addCondition":
+          onAction({
+            type: "condition",
+            index: itemIndex,
+            condition: action.condition,
+          })
+          break
+        case "addMutation":
+          onAction({
+            type: "mutation",
+            index: itemIndex,
+            mutation: action.mutation,
+          })
+          break
+        case "addRule":
+          onAction({
+            type: "rule",
+            rule: action.rule,
+          })
+      }
+    },
+    [onAction, currentPath]
+  )
 
   useEffectOnce(() => {
     if (refContainer.current == null) {
@@ -87,16 +122,20 @@ export default function RulesEditor(props: EditorProps) {
     const onChange = props.onChange || (() => {})
 
     function onJsonChange(content: Content) {
+      let value: JSONValue
+
       if ("json" in content) {
-        if (feedTransformValidator(content.json || "").length === 0)
-          onChange(content.json || "")
+        value = content.json || {}
       } else {
         try {
-          onChange(JSON.parse(content.text))
+          value = JSON.parse(content.text)
         } catch (e) {
           // Do nothing intentionally
+          return
         }
       }
+
+      if (feedTransformValidator(value).length === 0) onChange(value)
     }
 
     function onSelect(selection: JSONEditorSelection): void {
@@ -115,41 +154,6 @@ export default function RulesEditor(props: EditorProps) {
       }
     }
 
-    const emitAction = (action: Action) => () =>
-      (props.onAction || (() => {}))(action)
-
-    function onRenderMenu(items: MenuItem[]): MenuItem[] {
-      const finalItems = [...items]
-      if (isRulesSelected) {
-        finalItems.push({
-          onClick: emitAction({ type: "rule" }),
-          type: "button",
-          text: "+ Rule",
-          title: "Add Rule",
-        })
-
-        if (currentPath.length > 1) {
-          const itemIndex = parseInt(currentPath[1])
-          finalItems.push(
-            {
-              onClick: emitAction({ type: "condition", index: itemIndex }),
-              type: "button",
-              text: "+ Condition",
-              title: "Add Condition",
-            },
-            {
-              onClick: emitAction({ type: "mutation", index: itemIndex }),
-              type: "button",
-              text: "+ Mutation",
-              title: "Add Mutation",
-            }
-          )
-        }
-      }
-
-      return finalItems
-    }
-
     function onRenderValue(
       renderProps: RenderValueProps
     ): RenderValueComponentDescription[] {
@@ -166,19 +170,27 @@ export default function RulesEditor(props: EditorProps) {
         ...props,
         onChange: onJsonChange,
         onRenderValue,
-        onRenderMenu,
         onSelect,
       }
       delete newProps["readOnlyKeys"]
 
       refEditorInstance.current.updateProps(newProps)
     }
-  }, [props, currentPath, isRulesSelected])
+  }, [props, currentPath])
 
   useEffect(() => {
     if (refEditorInstance.current)
       refEditorInstance.current.update({ json: props.value })
   }, [props.value])
 
-  return <div className="jsoneditor" ref={refContainer}></div>
+  return (
+    <Stack spacing={1}>
+      <RuleActions
+        onRuleAction={onRuleAction}
+        ruleOnly={currentPath.length < 2}
+        disabled={props.readOnly}
+      />
+      <div className="jsoneditor" ref={refContainer}></div>
+    </Stack>
+  )
 }

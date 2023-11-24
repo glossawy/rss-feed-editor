@@ -1,5 +1,5 @@
 import functools
-from typing import Protocol, Callable, ParamSpec
+from typing import Protocol, Callable
 from typing_extensions import TypedDict
 import re
 

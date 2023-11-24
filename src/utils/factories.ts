@@ -2,9 +2,9 @@ import type { Condition, Mutation, Rule, FeedTransform } from "./rules"
 
 type BaseParams = { xpath?: string }
 
-type ContainsParams = BaseParams & { value: string }
+type ContainsParams = BaseParams & { value?: string }
 
-function trimXPath<T extends Condition | Mutation>(obj: T): T {
+function trimXPath<T extends object>(obj: T): T {
   if ("xpath" in obj && obj.xpath == undefined) delete obj["xpath"]
 
   return obj
@@ -16,7 +16,7 @@ export const Conditions = {
       xpath,
       name: "contains",
       args: {
-        value,
+        value: value || "",
       },
     })
   },
@@ -34,6 +34,27 @@ export const Mutations = {
       xpath,
       name: "remove",
       args: {},
+    })
+  },
+  replace({ xpath }: BaseParams): Mutation {
+    return trimXPath({
+      xpath,
+      name: "replace",
+      args: {
+        pattern: "",
+        replacement: "",
+        trim: false,
+      },
+    })
+  },
+}
+
+export const Rules = {
+  empty({ xpath = "//" }: BaseParams): Rule {
+    return trimXPath<Rule>({
+      xpath,
+      condition: Conditions.contains({}),
+      mutations: [],
     })
   },
 }
