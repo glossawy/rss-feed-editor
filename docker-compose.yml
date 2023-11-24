@@ -1,0 +1,26 @@
+version: "3.1"
+services:
+  app:
+    build: .
+    ports:
+      - 3001:5000
+    restart: unless-stopped
+    networks:
+      - dev
+    volumes:
+      - ./app:/app/app
+
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - 3000:80
+    depends_on:
+      - app
+    volumes:
+      - ./dev/Caddyfile:/etc/caddy/Caddyfile
+      - ./dist:/var/www/app/html
+    networks:
+      - dev
+networks:
+  dev:

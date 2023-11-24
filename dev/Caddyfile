@@ -1,0 +1,10 @@
+:80 {
+	handle_path /api/* {
+		reverse_proxy app:5000
+	}
+
+	root * /var/www/app/html
+
+	encode gzip
+	file_server
+}
