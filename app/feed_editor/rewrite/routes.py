@@ -6,7 +6,7 @@ from typing import Mapping
 from flask import Blueprint, request
 
 from werkzeug.exceptions import BadRequest
-from app.feed_editor.utils.normalizers import normalize_xml
+from feed_editor.utils.normalizers import normalize_xml
 
 from feed_editor.rewrite.rewriter import FeedRewriter
 from feed_editor.rewrite.rules import validate_dict, validate_xpaths
