@@ -16,7 +16,6 @@ import {
   renderValue,
   JSONEditorSelection,
   SelectionType,
-  MenuItem,
 } from "svelte-jsoneditor"
 import useEffectOnce from "../utils/useEffectOnce"
 

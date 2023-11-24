@@ -1,18 +1,28 @@
 import type { FeedTransform } from "./rules"
 
+const IS_FLASK_DEV =
+  window.location.hostname === "localhost" && window.location.port === "5000"
+const API_HOSTNAME = window.location.hostname
+const API_PORT = window.location.port
+
+const API_HOST = API_PORT === "" ? API_HOSTNAME : `${API_HOSTNAME}:${API_PORT}`
+const API_PATH = IS_FLASK_DEV ? "" : "/api"
+
+const API_BASE = `${window.location.protocol}//${API_HOST}${API_PATH}`
+
 function textFromResponse(response: Response) {
   if (response.ok) return response.text()
   else throw new Error("Failed to fetch")
 }
 
 export function proxyUrl(url: string) {
-  return fetch(
-    `http://localhost:5000/_proxy/?url=${encodeURIComponent(url)}`
-  ).then(textFromResponse)
+  return fetch(`${API_BASE}/_proxy/?url=${encodeURIComponent(url)}`).then(
+    textFromResponse
+  )
 }
 
 export function encodeRules(rules: FeedTransform) {
-  return fetch(`http://localhost:5000/rewrite/url`, {
+  return fetch(`${API_BASE}/rewrite/url`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -22,7 +32,5 @@ export function encodeRules(rules: FeedTransform) {
 }
 
 export function getTransformedFeed(encodedRules: string) {
-  return fetch(`http://localhost:5000/rewrite/?r=${encodedRules}`).then(
-    textFromResponse
-  )
+  return fetch(`${API_BASE}/rewrite/?r=${encodedRules}`).then(textFromResponse)
 }
