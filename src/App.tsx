@@ -1,19 +1,17 @@
-import RulesEditor, { Action, JSONValue } from "./components/RulesEditor"
+import RulesEditor, { JSONValue } from "./components/RulesEditor"
 import FeedDiff from "./components/FeedDiff"
 import RulesEditorForm, { FormValues } from "./components/RulesEditorForm"
 
 import { useCallback, useState } from "react"
 import { Stack, CssVarsProvider, CssBaseline, Typography, Link } from "@mui/joy"
 
-import { addToCondition, type FeedTransform, type Rule } from "./utils/rules"
-import { FeedTransforms } from "./utils/factories"
+import { type FeedTransform } from "./utils/rules"
 import * as api from "./utils/api"
+import useFeedTransform from "./useFeedTransform"
 
 function App() {
   const [feedUrl, setFeedUrl] = useState("")
-  const [feedRules, setFeedRules] = useState<FeedTransform>(
-    FeedTransforms.empty()
-  )
+  const [feedTransform, dispatch] = useFeedTransform()
   const [encodedRules, setEncodedRules] = useState<string | null>(null)
 
   const handleSubmit = useCallback(
@@ -21,9 +19,9 @@ function App() {
       const { feedUrl } = formValues
 
       setFeedUrl(feedUrl)
-      setFeedRules({ ...feedRules, feed_url: feedUrl })
+      dispatch({ type: "setUrl", url: feedUrl })
     },
-    [feedRules]
+    [dispatch]
   )
 
   const handleJsonUpdate = useCallback(
@@ -31,53 +29,10 @@ function App() {
       const newTransform = json as FeedTransform
       const newFeedRules = { ...newTransform, feed_url: feedUrl }
 
-      setFeedRules(newFeedRules)
+      dispatch({ type: "replace", transform: newFeedRules })
       api.encodeRules(newFeedRules).then(setEncodedRules)
     },
-    [feedUrl]
-  )
-
-  const handleEditorAction = useCallback(
-    (action: Action) => {
-      const updateRule = (
-        index: number,
-        transform: (rule: Rule) => Rule
-      ): FeedTransform => {
-        const newRules = [...feedRules.rules]
-        const rule = newRules[index]
-
-        newRules[index] = transform(rule)
-        return { ...feedRules, rules: newRules }
-      }
-
-      switch (action.type) {
-        case "rule":
-          setFeedRules({
-            ...feedRules,
-            rules: [...feedRules.rules, action.rule],
-          })
-          break
-        case "mutation":
-          setFeedRules(
-            updateRule(action.index, (rule) => ({
-              ...rule,
-              mutations: [...rule.mutations, action.mutation],
-            }))
-          )
-          break
-        case "condition":
-          setFeedRules(
-            updateRule(action.index, (rule) => ({
-              ...rule,
-              condition: addToCondition(rule.condition, action.condition),
-            }))
-          )
-          break
-        default:
-          break
-      }
-    },
-    [feedRules]
+    [dispatch, feedUrl]
   )
 
   return (
@@ -101,10 +56,10 @@ function App() {
         <Stack spacing={1}>
           <RulesEditor
             readOnly={encodedRules === null}
-            value={feedRules}
+            value={feedTransform}
             readOnlyKeys={["feed_url", "rules"]}
             onChange={handleJsonUpdate}
-            onAction={handleEditorAction}
+            onAction={dispatch}
           />
           <FeedDiff feedUrl={feedUrl} encodedRules={encodedRules} />
         </Stack>

@@ -4,7 +4,6 @@ import {
   useEffect,
   useState,
   useCallback,
-  useMemo,
 } from "react"
 
 import {
@@ -19,10 +18,11 @@ import {
 } from "svelte-jsoneditor"
 import useEffectOnce from "../utils/useEffectOnce"
 
-import { Condition, FeedTransform, Mutation, Rule } from "../utils/rules"
+import { FeedTransform } from "../utils/rules"
 import createZodValidator from "../utils/createZodValidator"
 import { Stack } from "@mui/joy"
 import RuleActions, { RuleAction } from "./RuleActions"
+import { FeedTransformAction } from "../useFeedTransform"
 
 export type JSONPrimitive = string | number | boolean | null
 export type JSONValue =
@@ -35,25 +35,12 @@ export type JSONObject = {
   [key: string]: JSONValue
 }
 
-export type Action =
-  | { type: "rule"; rule: Rule }
-  | {
-      type: "condition"
-      index: number
-      condition: Condition
-    }
-  | {
-      type: "mutation"
-      index: number
-      mutation: Mutation
-    }
-
 declare type EditorProps = {
   value: JSONObject
   readOnly?: boolean
   readOnlyKeys?: Array<string>
   onChange?: (json: JSONValue) => void
-  onAction?: (action: Action) => void
+  onAction: (action: FeedTransformAction) => void
 }
 
 const feedTransformValidator = createZodValidator(FeedTransform)
@@ -63,9 +50,8 @@ export default function RulesEditor(props: EditorProps) {
   const refEditorInstance: MutableRefObject<SvelteJSONEditor | null> =
     useRef(null)
 
+  const onAction = props.onAction
   const [currentPath, setCurrentPath] = useState<string[]>([])
-
-  const onAction = useMemo(() => props.onAction || (() => {}), [props.onAction])
 
   const onRuleAction = useCallback(
     (action: RuleAction) => {
@@ -73,21 +59,21 @@ export default function RulesEditor(props: EditorProps) {
       switch (action.type) {
         case "addCondition":
           onAction({
-            type: "condition",
-            index: itemIndex,
+            type: "addCondition",
+            ruleIndex: itemIndex,
             condition: action.condition,
           })
           break
         case "addMutation":
           onAction({
-            type: "mutation",
-            index: itemIndex,
+            type: "addMutation",
+            ruleIndex: itemIndex,
             mutation: action.mutation,
           })
           break
         case "addRule":
           onAction({
-            type: "rule",
+            type: "addRule",
             rule: action.rule,
           })
       }
@@ -105,7 +91,7 @@ export default function RulesEditor(props: EditorProps) {
       props: {
         mode: "tree" as Mode,
         validator: feedTransformValidator,
-        mainMenuBar: true,
+        mainMenuBar: false,
       },
     })
 
