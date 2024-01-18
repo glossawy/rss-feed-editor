@@ -1,5 +1,5 @@
 #!/bin/sh
 
-cd ./app
+poetry install
 
-poetry run flask -A feed_editor --debug run --host '0.0.0.0' --port 5000
+poetry run -C ./app flask -A feed_editor --debug run --host '0.0.0.0' --port 5000

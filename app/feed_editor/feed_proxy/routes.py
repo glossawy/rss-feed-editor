@@ -3,7 +3,7 @@ import urllib.parse as urlparse
 import httpx
 from flask import Blueprint, request
 
-from app.feed_editor.utils.normalizers import normalize_xml
+from feed_editor.utils.normalizers import normalize_xml
 
 
 proxy_api = Blueprint("feed_proxy", __name__, url_prefix="/_proxy")
