@@ -44,7 +44,7 @@ def _replace(element: etree._Element, args: ReplaceArgs, /):
     elem_text = element.text
 
     if elem_text is not None:
-        elem_text = re.sub(args["pattern"], args["replacement"], elem_text, re.DOTALL)
+        elem_text = re.sub(args["pattern"], args["replacement"], elem_text, flags=re.DOTALL)
         if args["trim"]:
             elem_text = elem_text.strip()
 
