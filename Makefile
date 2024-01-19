@@ -6,4 +6,4 @@ start-locally: build
 	docker compose up
 
 dev-server:
-	npm run dev
+	poetry run -C ./app flask -A feed_editor --debug run

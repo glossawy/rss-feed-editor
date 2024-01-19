@@ -1,12 +1,12 @@
 import type { FeedTransform } from "./rules"
 
-const IS_FLASK_DEV =
-  window.location.hostname === "localhost" && window.location.port === "5000"
+const IS_VITE =
+  window.location.hostname === "localhost" && window.location.port === "5173"
 const API_HOSTNAME = window.location.hostname
-const API_PORT = window.location.port
+const API_PORT = IS_VITE ? "5000" : window.location.port
 
 const API_HOST = API_PORT === "" ? API_HOSTNAME : `${API_HOSTNAME}:${API_PORT}`
-const API_PATH = IS_FLASK_DEV ? "" : "/api"
+const API_PATH = IS_VITE ? "" : "/api"
 
 const API_BASE = `${window.location.protocol}//${API_HOST}${API_PATH}`
 
@@ -31,6 +31,10 @@ export function encodeRules(rules: FeedTransform) {
   }).then(textFromResponse)
 }
 
+export function toRewriteUrl(encodedRules: string) {
+  return `${API_BASE}/rewrite/?r=${encodedRules}`
+}
+
 export function getTransformedFeed(encodedRules: string) {
-  return fetch(`${API_BASE}/rewrite/?r=${encodedRules}`).then(textFromResponse)
+  return fetch(toRewriteUrl(encodedRules)).then(textFromResponse)
 }

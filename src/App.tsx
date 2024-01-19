@@ -43,11 +43,8 @@ function App() {
         <Stack id="rss-outputs" spacing={0}>
           <Typography level="title-sm">Transformed Feed URL</Typography>
           {encodedRules ? (
-            <Link
-              href={`http://localhost:5000/rewrite/?r=${encodedRules}`}
-              level="body-sm"
-            >
-              http://localhost:5000/rewrite/?r={encodedRules}
+            <Link href={api.toRewriteUrl(encodedRules)} level="body-sm">
+              {api.toRewriteUrl(encodedRules)}
             </Link>
           ) : (
             <Typography level="body-sm">No valid rules yet</Typography>

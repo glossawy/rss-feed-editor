@@ -4,6 +4,7 @@
 	}
 
 	root * /var/www/app/html
+	reverse_proxy /rewrite/* app:5000
 
 	encode gzip
 	file_server
