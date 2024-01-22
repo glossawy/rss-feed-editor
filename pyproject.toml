@@ -11,18 +11,15 @@ packages = [{ include = 'feed_editor', from = 'app' }]
 python = "^3.11"
 Flask = "^2.3.3"
 flask-cors = "^4.0.0"
-flask-httpauth = "^4.8.0"
-flask-limiter = "^3.5.0"
 lxml = "^4.9.3"
 httpx = "^0.25.0"
 validators = "^0.22.0"
-inflection = "^0.5.1"
-lxml-stubs = "^0.4.0"
 pydantic = "^2.3.0"
 
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.5"
+lxml-stubs = "^0.5.1"
 
 [build-system]
 requires = ["poetry-core"]
