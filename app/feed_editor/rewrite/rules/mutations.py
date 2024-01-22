@@ -4,7 +4,6 @@ from typing_extensions import TypedDict
 import re
 
 from lxml import etree
-
 from feed_editor.utils.dict_validation import validate_typed_dict, _TypedDict_T
 
 
@@ -44,14 +43,25 @@ def _replace(element: etree._Element, args: ReplaceArgs, /):
     elem_text = element.text
 
     if elem_text is not None:
-        elem_text = re.sub(args["pattern"], args["replacement"], elem_text, flags=re.DOTALL)
+        elem_text = re.sub(
+            args["pattern"], args["replacement"], elem_text, flags=re.DOTALL
+        )
         if args["trim"]:
             elem_text = elem_text.strip()
 
     element.text = elem_text
 
 
-MutationArgs = ReplaceArgs | RemoveArgs
+class ChangeTagArgs(TypedDict):
+    tag: str
+
+
+@_require_args(ChangeTagArgs)
+def _change_tag(element: etree._Element, args: ChangeTagArgs, /):
+    element.tag = args["tag"]
+
+
+MutationArgs = ReplaceArgs | RemoveArgs | ChangeTagArgs
 
 
 class MutationFn(Protocol):
@@ -69,6 +79,7 @@ class Mutation(TypedDict):
 mutation_list: list[Mutation] = [
     {"display_name": "remove", "definition": _remove, "arg_spec": RemoveArgs},
     {"display_name": "replace", "definition": _replace, "arg_spec": ReplaceArgs},
+    {"display_name": "changeTag", "definition": _change_tag, "arg_spec": ChangeTagArgs},
 ]
 
 mutation_map: dict[str, Mutation] = {mut["display_name"]: mut for mut in mutation_list}

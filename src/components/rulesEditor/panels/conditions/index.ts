@@ -1,0 +1,6 @@
+import { Condition } from "../../../../utils/rules"
+
+export type ConditionFormProps<T extends Condition> = {
+  condition: T
+  onChange: (cond: Condition) => void
+}
