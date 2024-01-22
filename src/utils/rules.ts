@@ -26,18 +26,20 @@ const XPathBase = z.object({
 
 const ConditionBase = XPathBase
 
-const ContainsCondition = ConditionBase.extend({
+export const ContainsCondition = ConditionBase.extend({
   name: z.literal("contains"),
   args: z.object({
     value: z.string(),
   }),
 })
 
-const AllOfCondition: z.ZodType<{ all_of: Condition[] }> = z.object({
+export type SingleCondition = z.infer<typeof ContainsCondition>
+
+export const AllOfCondition: z.ZodType<{ all_of: Condition[] }> = z.object({
   all_of: z.lazy(() => Condition.array()),
 })
 
-const AnyOfCondition: z.ZodType<{ any_of: Condition[] }> = z.object({
+export const AnyOfCondition: z.ZodType<{ any_of: Condition[] }> = z.object({
   any_of: z.lazy(() => Condition.array()),
 })
 
@@ -52,12 +54,12 @@ export type Condition = z.infer<typeof Condition>
 
 const MutationBase = XPathBase
 
-const RemoveMutation = MutationBase.extend({
+export const RemoveMutation = MutationBase.extend({
   name: z.literal("remove"),
   args: emptyObject("Remove requires no arguments"),
 })
 
-const ReplaceMutation = MutationBase.extend({
+export const ReplaceMutation = MutationBase.extend({
   name: z.literal("replace"),
   args: z.object({
     pattern: z.string(),
@@ -66,7 +68,18 @@ const ReplaceMutation = MutationBase.extend({
   }),
 })
 
-export const Mutation = z.union([RemoveMutation, ReplaceMutation])
+export const ChangeTagMutation = MutationBase.extend({
+  name: z.literal("changeTag"),
+  args: z.object({
+    tag: z.string(),
+  }),
+})
+
+export const Mutation = z.union([
+  RemoveMutation,
+  ReplaceMutation,
+  ChangeTagMutation,
+])
 export type Mutation = z.infer<typeof Mutation>
 
 /// RULES / FEED TRANSFORM
@@ -89,16 +102,3 @@ export const FeedTransform = z.object({
 })
 
 export type FeedTransform = z.infer<typeof FeedTransform>
-
-export function addToCondition(
-  initial: Condition,
-  summand: Condition
-): Condition {
-  if ("all_of" in initial) {
-    return { all_of: [...initial.all_of, summand] }
-  } else if ("any_of" in initial) {
-    return { any_of: [...initial.any_of, summand] }
-  } else {
-    return { any_of: [initial, summand] }
-  }
-}

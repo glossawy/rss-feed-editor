@@ -6,7 +6,6 @@ from typing import Mapping
 from flask import Blueprint, request
 
 from werkzeug.exceptions import BadRequest
-from feed_editor.utils.normalizers import normalize_xml
 
 from feed_editor.rewrite.rewriter import FeedRewriter
 from feed_editor.rewrite.rules import validate_dict, validate_xpaths
@@ -23,7 +22,7 @@ def get():
         return "Feed URL must be a valid url", 400
 
     return (
-        normalize_xml(feed_rewriter.rewritten_feed.as_xml()),
+        feed_rewriter.rewritten_feed.as_xml(),
         200,
         {"Content-Type": feed_rewriter.mime_type},
     )

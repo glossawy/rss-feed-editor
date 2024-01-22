@@ -6,7 +6,6 @@ from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 import feed_editor.rewrite as rewrite
-import feed_editor.feed_proxy as feed_proxy
 import feed_editor.health_check as health_check
 
 
@@ -21,7 +20,6 @@ def create_app() -> Flask:
 
     blueprints: list[Blueprint] = [
         rewrite.blueprint,
-        feed_proxy.blueprint,
         health_check.blueprint,
     ]
 

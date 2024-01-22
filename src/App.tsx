@@ -1,67 +1,31 @@
-import RulesEditor, { JSONValue } from "./components/RulesEditor"
-import FeedDiff from "./components/FeedDiff"
-import RulesEditorForm, { FormValues } from "./components/RulesEditorForm"
+import FeedUrlForm from "./components/FeedUrlForm"
 
-import { useCallback, useState } from "react"
-import { Stack, CssVarsProvider, CssBaseline, Typography, Link } from "@mui/joy"
+import { Grid, Stack, Typography } from "@mui/joy"
 
-import { type FeedTransform } from "./utils/rules"
-import * as api from "./utils/api"
-import useFeedTransform from "./useFeedTransform"
+import { FeedDataProvider } from "./components/FeedDataProvider"
+import FeedPreviewLink from "./components/FeedPreviewLink"
+import RulesEditor from "./components/RulesEditor"
+import DarkModeToggle from "./components/DarkModeToggle"
 
 function App() {
-  const [feedUrl, setFeedUrl] = useState("")
-  const [feedTransform, dispatch] = useFeedTransform()
-  const [encodedRules, setEncodedRules] = useState<string | null>(null)
-
-  const handleSubmit = useCallback(
-    (formValues: FormValues) => {
-      const { feedUrl } = formValues
-
-      setFeedUrl(feedUrl)
-      dispatch({ type: "setUrl", url: feedUrl })
-    },
-    [dispatch]
-  )
-
-  const handleJsonUpdate = useCallback(
-    (json: JSONValue) => {
-      const newTransform = json as FeedTransform
-      const newFeedRules = { ...newTransform, feed_url: feedUrl }
-
-      dispatch({ type: "replace", transform: newFeedRules })
-      api.encodeRules(newFeedRules).then(setEncodedRules)
-    },
-    [dispatch, feedUrl]
-  )
-
   return (
-    <CssVarsProvider>
-      <CssBaseline />
-      <Stack sx={{ margin: 4 }} spacing={2}>
-        <RulesEditorForm onSubmit={handleSubmit} />
+    <FeedDataProvider>
+      <Stack sx={{ marginY: 4, marginX: 8 }} spacing={2}>
+        <Grid container>
+          <Grid xs={10}>
+            <FeedUrlForm />
+          </Grid>
+          <Grid xs={2}>
+            <DarkModeToggle />
+          </Grid>
+        </Grid>
         <Stack id="rss-outputs" spacing={0}>
           <Typography level="title-sm">Transformed Feed URL</Typography>
-          {encodedRules ? (
-            <Link href={api.toRewriteUrl(encodedRules)} level="body-sm">
-              {api.toRewriteUrl(encodedRules)}
-            </Link>
-          ) : (
-            <Typography level="body-sm">No valid rules yet</Typography>
-          )}
+          <FeedPreviewLink />
         </Stack>
-        <Stack spacing={1}>
-          <RulesEditor
-            readOnly={encodedRules === null}
-            value={feedTransform}
-            readOnlyKeys={["feed_url", "rules"]}
-            onChange={handleJsonUpdate}
-            onAction={dispatch}
-          />
-          <FeedDiff feedUrl={feedUrl} encodedRules={encodedRules} />
-        </Stack>
+        <RulesEditor />
       </Stack>
-    </CssVarsProvider>
+    </FeedDataProvider>
   )
 }
 

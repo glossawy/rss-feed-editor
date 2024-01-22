@@ -1,9 +1,5 @@
 import copy
-import functools
 from typing import cast
-from anyio import Condition
-
-from pydantic.type_adapter import TypeAdapter
 
 from lxml import etree
 
