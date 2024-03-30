@@ -1,8 +1,9 @@
 import { useCallback, useState } from "react"
-import OrderedCard from "./orderedCardList/OrderedCard"
 import { Button, Stack } from "@mui/joy"
 import * as Icons from "@mui/icons-material"
 import { SxProps } from "@mui/joy/styles/types"
+
+import OrderedCard from "./orderedCardList/OrderedCard"
 
 type Props<T> = {
   items: T[]

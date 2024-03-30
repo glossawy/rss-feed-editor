@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react"
-import { Rule } from "../utils/rules"
-import { DefaultFactories } from "../utils/defaults"
+
+import { Rule } from "@app/utils/rules"
+import { DefaultFactories } from "@app/utils/defaults"
 
 export type FeedAction =
   | { type: "setUrl"; feedUrl: string }

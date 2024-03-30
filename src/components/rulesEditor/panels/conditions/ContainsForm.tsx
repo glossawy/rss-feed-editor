@@ -1,8 +1,10 @@
 import { z } from "zod"
-import { ConditionFormProps } from "."
-import { ContainsCondition } from "../../../../utils/rules"
 import { FormControl, FormLabel, Stack } from "@mui/joy"
-import DebouncedInput from "../../../DebounceInput"
+
+import { ContainsCondition } from "@app/utils/rules"
+import DebouncedInput from "@app/components/DebounceInput"
+
+import { ConditionFormProps } from "."
 
 export default function ContainsForm({
   condition,

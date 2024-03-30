@@ -1,14 +1,16 @@
 import { useCallback, useState } from "react"
 import { Grid, Stack } from "@mui/joy"
-import EditorSidebar from "./rulesEditor/EditorSidebar"
+
 import {
   RuleWithMetadata,
   useFeedData,
   useFeedDataDispatch,
-} from "../contexts/feedData"
+} from "@app/contexts/feedData"
+import { DefaultFactories } from "@app/utils/defaults"
+import { Rule } from "@app/utils/rules"
+
 import EditorRuleView from "./rulesEditor/EditorRuleView"
-import { DefaultFactories } from "../utils/defaults"
-import { Rule } from "../utils/rules"
+import EditorSidebar from "./rulesEditor/EditorSidebar"
 
 export default function RulesEditor() {
   const [targetRuleId, setTargetRuleId] = useState<number | null>(null)

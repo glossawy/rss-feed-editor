@@ -1,7 +1,8 @@
-import { Sheet, Typography } from "@mui/joy"
-import { RuleWithMetadata } from "../../contexts/feedData"
-import OrderedCardList from "../OrderedCardList"
-import EditableLabel from "../EditableLabel"
+import { Sheet } from "@mui/joy"
+
+import { RuleWithMetadata } from "@app/contexts/feedData"
+import OrderedCardList from "@app/components/OrderedCardList"
+import EditableLabel from "@app/components/EditableLabel"
 
 // TODO: Turn EditorSidebar list into reusable, generic OrderedCardList that allows arbitrary card contents
 // TODO: Use OrderedCardList to implement Condition tree editor using nested card lists, it will work but be gross

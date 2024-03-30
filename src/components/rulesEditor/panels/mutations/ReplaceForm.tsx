@@ -1,8 +1,10 @@
 import { z } from "zod"
-import { ReplaceMutation } from "../../../../utils/rules"
 import { Checkbox, FormControl, FormLabel, Input, Stack } from "@mui/joy"
+
+import { ReplaceMutation } from "@app/utils/rules"
+import DebouncedInput from "@app/components/DebounceInput"
+
 import { MutationFormProps } from "."
-import DebouncedInput from "../../../DebounceInput"
 
 type Props = MutationFormProps<z.infer<typeof ReplaceMutation>>
 

@@ -1,8 +1,9 @@
-import { Condition } from "../../../../utils/rules"
-import collections from "../../../../utils/collections"
-import OrderedCardList from "../../../OrderedCardList"
+import OrderedCardList from "@app/components/OrderedCardList"
+import { DefaultFactories } from "@app/utils/defaults"
+import { Condition } from "@app/utils/rules"
+import collections from "@app/utils/collections"
+
 import ConditionResolver from "./ConditionResolver"
-import { DefaultFactories } from "../../../../utils/defaults"
 
 type Props = {
   conditions: Condition[]

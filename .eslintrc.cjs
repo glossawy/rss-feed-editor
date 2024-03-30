@@ -8,7 +8,14 @@ module.exports = {
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parser: '@typescript-eslint/parser',
-  plugins: ['react-refresh'],
+  plugins: ['react-refresh', 'import'],
+  settings: {
+    'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
+    'import/internal-regex': '^@app/',
+  },
   rules: {
     'no-unused-vars': 'warn',
     '@typescript-eslint/no-unused-vars': 'warn',
@@ -19,6 +26,27 @@ module.exports = {
     'semi': [
       'error',
       'never'
-    ]
+    ],
+    'sort-imports': [
+      'warn',
+      { ignoreDeclarationSort: true, allowSeparatedGroups: true },
+    ],
+    'import/order': [
+      'warn',
+      {
+        groups: [
+          'builtin',
+          'external',
+          'internal',
+          'sibling',
+          'parent',
+          'index',
+        ],
+        pathGroups: [
+          { pattern: '@app', group: 'internal' },
+        ],
+        'newlines-between': 'always',
+      }
+    ],
   },
 }

@@ -1,8 +1,9 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
-import App from "./App.tsx"
 import { CssBaseline, CssVarsProvider } from "@mui/joy"
-import { QueryClientProvider, QueryClient } from "react-query"
+import { QueryClient, QueryClientProvider } from "react-query"
+
+import App from "./App.tsx"
 
 const queryClient = new QueryClient()
 

@@ -1,7 +1,8 @@
 import { useQuery } from "react-query"
 
+import { useFeedData } from "@app/contexts/feedData"
+
 import type { FeedTransform } from "./rules"
-import { useFeedData } from "../contexts/feedData"
 
 type ApiDetails = Readonly<{
   hostname: string

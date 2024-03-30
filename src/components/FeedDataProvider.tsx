@@ -1,3 +1,8 @@
+import { PropsWithChildren, useReducer } from "react"
+
+import collections from "@app/utils/collections"
+import { Rule } from "@app/utils/rules"
+
 import {
   FeedAction,
   FeedData,
@@ -6,9 +11,6 @@ import {
   RuleWithMetadata,
   initialFeedData,
 } from "../contexts/feedData"
-import collections from "../utils/collections"
-import { Rule } from "../utils/rules"
-import { PropsWithChildren, useReducer } from "react"
 
 export const FeedDataProvider = ({ children }: PropsWithChildren<object>) => {
   const [feedData, feedDataDispatch] = useReducer(

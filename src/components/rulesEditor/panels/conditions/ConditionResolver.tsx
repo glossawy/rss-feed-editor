@@ -1,8 +1,10 @@
 import { FormControl, FormLabel, Option, Select, Stack } from "@mui/joy"
-import { Condition, SingleCondition } from "../../../../utils/rules"
+
+import { Condition, SingleCondition } from "@app/utils/rules"
+import { DefaultFactories } from "@app/utils/defaults"
+
 import Join from "./Join"
 import ContainsForm from "./ContainsForm"
-import { DefaultFactories } from "../../../../utils/defaults"
 
 type Props = {
   condition: Condition

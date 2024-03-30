@@ -1,11 +1,13 @@
 import { Option, Select, Stack } from "@mui/joy"
-import { Mutation } from "../../../utils/rules"
-import collections from "../../../utils/collections"
-import OrderedCardList from "../../OrderedCardList"
+import { useCallback } from "react"
+
+import { Mutation } from "@app/utils/rules"
+import collections from "@app/utils/collections"
+import OrderedCardList from "@app/components/OrderedCardList"
+import { DefaultFactories } from "@app/utils/defaults"
+
 import RemoveForm from "./mutations/RemoveForm"
 import { MutationFormProps } from "./mutations"
-import { useCallback } from "react"
-import { DefaultFactories } from "../../../utils/defaults"
 import ChangeTagForm from "./mutations/ChangeTagForm"
 import ReplaceForm from "./mutations/ReplaceForm"
 

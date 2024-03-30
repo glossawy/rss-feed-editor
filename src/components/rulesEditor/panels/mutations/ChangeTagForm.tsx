@@ -1,8 +1,10 @@
 import { z } from "zod"
-import { ChangeTagMutation } from "../../../../utils/rules"
 import { FormControl, FormLabel, Stack } from "@mui/joy"
+
+import { ChangeTagMutation } from "@app/utils/rules"
+import DebouncedInput from "@app/components/DebounceInput"
+
 import { MutationFormProps } from "."
-import DebouncedInput from "../../../DebounceInput"
 
 type Props = MutationFormProps<z.infer<typeof ChangeTagMutation>>
 

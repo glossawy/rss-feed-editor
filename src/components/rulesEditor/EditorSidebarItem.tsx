@@ -1,8 +1,7 @@
 import { ButtonGroup, Card, Grid, IconButton, Typography } from "@mui/joy"
-
 import * as Icons from "@mui/icons-material"
 
-import { stopPropagation } from "../../utils/events"
+import { stopPropagation } from "@app/utils/events"
 
 type Props = {
   label: string

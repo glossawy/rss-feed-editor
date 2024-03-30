@@ -1,4 +1,3 @@
-import { FeedAction, RuleWithMetadata } from "../../contexts/feedData"
 import {
   Box,
   FormControl,
@@ -10,10 +9,13 @@ import {
   Tabs,
   Typography,
 } from "@mui/joy"
-import { Condition, Mutation, Rule } from "../../utils/rules"
 import { useCallback } from "react"
+
+import { RuleWithMetadata } from "@app/contexts/feedData"
+import { Condition, Mutation, Rule } from "@app/utils/rules"
+import DebouncedInput from "@app/components/DebounceInput"
+
 import MutationsPanel from "./panels/MutationsPanel"
-import DebouncedInput from "../DebounceInput"
 import ConditionsPanel from "./panels/ConditionsPanel"
 
 type Props = {

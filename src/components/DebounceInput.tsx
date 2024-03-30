@@ -8,7 +8,7 @@ export default function DebouncedInput(props: Props) {
   const [value, setValue] = useState(props.value)
 
   const timeout = debounceTimeout || 1_000
-  const timer = useRef<number>()
+  const timer = useRef<NodeJS.Timeout>()
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -1,8 +1,10 @@
 import { z } from "zod"
-import { RemoveMutation } from "../../../../utils/rules"
 import { FormControl, FormLabel } from "@mui/joy"
+
+import { RemoveMutation } from "@app/utils/rules"
+import DebouncedInput from "@app/components/DebounceInput"
+
 import { MutationFormProps } from "."
-import DebouncedInput from "../../../DebounceInput"
 
 type Props = MutationFormProps<z.infer<typeof RemoveMutation>>
 

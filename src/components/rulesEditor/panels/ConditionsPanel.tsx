@@ -1,4 +1,5 @@
-import { Condition } from "../../../utils/rules"
+import { Condition } from "@app/utils/rules"
+
 import ConditionResolver from "./conditions/ConditionResolver"
 
 type Props = {
