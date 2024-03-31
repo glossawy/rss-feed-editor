@@ -1,7 +1,7 @@
 import OrderedCardList from "@app/components/OrderedCardList"
+import collections from "@app/utils/collections"
 import { DefaultFactories } from "@app/utils/defaults"
 import { Condition } from "@app/utils/rules"
-import collections from "@app/utils/collections"
 
 import ConditionResolver from "./ConditionResolver"
 

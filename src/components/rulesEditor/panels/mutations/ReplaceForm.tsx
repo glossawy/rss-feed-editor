@@ -1,8 +1,7 @@
+import { Checkbox, FormControl, FormLabel, Input, Stack } from "@mui/joy"
 import { z } from "zod"
-import { Checkbox, FormControl, FormLabel, Stack } from "@mui/joy"
 
 import { ReplaceMutation } from "@app/utils/rules"
-import DebouncedInput from "@app/components/DebounceInput"
 
 import { MutationFormProps } from "."
 
@@ -17,7 +16,7 @@ export default function ReplaceForm({ mutation, onChange }: Props) {
     <Stack spacing={1}>
       <FormControl>
         <FormLabel>XPath</FormLabel>
-        <DebouncedInput
+        <Input
           value={mutation.xpath}
           placeholder="Blank means replace self"
           onChange={(e) => onChange({ ...mutation, xpath: e.target.value })}
@@ -25,14 +24,14 @@ export default function ReplaceForm({ mutation, onChange }: Props) {
       </FormControl>
       <FormControl>
         <FormLabel>Pattern</FormLabel>
-        <DebouncedInput
+        <Input
           value={mutation.args.pattern}
           onChange={(e) => setArg({ pattern: e.target.value })}
         />
       </FormControl>
       <FormControl>
         <FormLabel>Replacement</FormLabel>
-        <DebouncedInput
+        <Input
           value={mutation.args.replacement}
           onChange={(e) => setArg({ replacement: e.target.value })}
         />

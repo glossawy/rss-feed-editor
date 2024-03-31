@@ -1,5 +1,6 @@
 import { useQuery } from "react-query"
 
+import { useDebouncedValue } from "@app/hooks/debouncedValue"
 import { useFeedData } from "@app/hooks/feedData"
 
 import type { FeedTransform } from "./rules"
@@ -77,7 +78,9 @@ export function getTransformedFeed(encodedRules: string) {
 }
 
 export function useEncodedRules() {
-  const { feedUrl, rules: rulesWithIds } = useFeedData()
+  const feedData = useFeedData()
+  const [{ feedUrl, rules: rulesWithIds }] = useDebouncedValue(feedData, 500)
+
   const rules = rulesWithIds.map((r) => r.rule)
 
   const { data } = useQuery({

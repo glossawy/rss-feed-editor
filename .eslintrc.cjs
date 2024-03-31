@@ -44,9 +44,14 @@ module.exports = {
         ],
         pathGroups: [
           { pattern: '@app', group: 'internal' },
+          { pattern: '@mui', group: 'external' }
         ],
         'newlines-between': 'always',
-      }
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: true,
+        },
+      },
     ],
   },
 }

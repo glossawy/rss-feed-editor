@@ -1,13 +1,13 @@
 import { CssBaseline, CssVarsProvider, Grid, Stack, Typography } from "@mui/joy"
 
-import { FeedDataProvider } from "@app/components/FeedDataProvider"
-import FeedPreviewLink from "@app/components/FeedPreviewLink"
-import RulesEditor from "@app/components/RulesEditor"
 import DarkModeToggle from "@app/components/DarkModeToggle"
+import { FeedDataProvider } from "@app/components/FeedDataProvider"
+import FeedDataResetButton from "@app/components/FeedDataResetButton"
+import FeedPreviewLink from "@app/components/FeedPreviewLink"
 import FeedUrlForm from "@app/components/FeedUrlForm"
+import RulesEditor from "@app/components/RulesEditor"
 import useLocalStorage from "@app/hooks/localStorage"
 import { LocalStorageKeys } from "@app/utils/defaults"
-import FeedDataResetButton from "@app/components/FeedDataResetButton"
 
 function App() {
   const [colorMode] = useLocalStorage(LocalStorageKeys.colorMode, "light")

@@ -2,6 +2,7 @@ import {
   Box,
   FormControl,
   FormLabel,
+  Input,
   Sheet,
   Tab,
   TabList,
@@ -9,14 +10,13 @@ import {
   Tabs,
   Typography,
 } from "@mui/joy"
-import { useCallback } from "react"
+import React, { useCallback } from "react"
 
 import { RuleWithMetadata } from "@app/hooks/feedData"
 import { Condition, Mutation, Rule } from "@app/utils/rules"
-import DebouncedInput from "@app/components/DebounceInput"
 
-import MutationsPanel from "./panels/MutationsPanel"
 import ConditionsPanel from "./panels/ConditionsPanel"
+import MutationsPanel from "./panels/MutationsPanel"
 
 type Props = {
   rule: RuleWithMetadata | null
@@ -49,8 +49,8 @@ function RuleView({
   onChange: (rule: Rule) => void
 }) {
   const handleXPathChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({ ...rule, xpath: e.target.value })
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      onChange({ ...rule, xpath: evt.target.value })
     },
     [onChange, rule]
   )
@@ -69,11 +69,12 @@ function RuleView({
     [onChange, rule]
   )
 
+  console.log(rule)
   return (
     <Box sx={{ maxHeight: "100%", overflow: "scroll" }}>
       <FormControl sx={{ padding: 1 }}>
         <FormLabel>Target XPath</FormLabel>
-        <DebouncedInput value={rule.xpath} onChange={handleXPathChange} />
+        <Input value={rule.xpath} onChange={handleXPathChange} />
       </FormControl>
       <Tabs defaultValue="conditions">
         <TabList>

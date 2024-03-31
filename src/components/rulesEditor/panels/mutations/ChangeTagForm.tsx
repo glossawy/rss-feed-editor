@@ -1,8 +1,7 @@
+import { FormControl, FormLabel, Input, Stack } from "@mui/joy"
 import { z } from "zod"
-import { FormControl, FormLabel, Stack } from "@mui/joy"
 
 import { ChangeTagMutation } from "@app/utils/rules"
-import DebouncedInput from "@app/components/DebounceInput"
 
 import { MutationFormProps } from "."
 
@@ -13,7 +12,7 @@ export default function ChangeTagForm({ mutation, onChange }: Props) {
     <Stack spacing={1}>
       <FormControl>
         <FormLabel>XPath</FormLabel>
-        <DebouncedInput
+        <Input
           value={mutation.xpath}
           placeholder="Blank means change self"
           onChange={(e) => onChange({ ...mutation, xpath: e.target.value })}
@@ -21,7 +20,7 @@ export default function ChangeTagForm({ mutation, onChange }: Props) {
       </FormControl>
       <FormControl>
         <FormLabel>Tag Name</FormLabel>
-        <DebouncedInput
+        <Input
           value={mutation.args.tag}
           onChange={(e) =>
             onChange({ ...mutation, args: { tag: e.target.value } })

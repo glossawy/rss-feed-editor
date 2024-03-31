@@ -1,8 +1,7 @@
+import { FormControl, FormLabel, Input } from "@mui/joy"
 import { z } from "zod"
-import { FormControl, FormLabel } from "@mui/joy"
 
 import { RemoveMutation } from "@app/utils/rules"
-import DebouncedInput from "@app/components/DebounceInput"
 
 import { MutationFormProps } from "."
 
@@ -12,7 +11,7 @@ export default function RemoveForm({ mutation, onChange }: Props) {
   return (
     <FormControl>
       <FormLabel>XPath</FormLabel>
-      <DebouncedInput
+      <Input
         value={mutation.xpath}
         placeholder="Blank means remove self"
         onChange={(e) => onChange({ ...mutation, xpath: e.target.value })}

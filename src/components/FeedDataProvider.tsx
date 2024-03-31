@@ -1,7 +1,5 @@
 import { PropsWithChildren, useCallback } from "react"
 
-import collections from "@app/utils/collections"
-import { Rule } from "@app/utils/rules"
 import {
   FeedAction,
   FeedData,
@@ -11,7 +9,9 @@ import {
   initialFeedData,
 } from "@app/hooks/feedData"
 import useLocalStorage from "@app/hooks/localStorage"
+import collections from "@app/utils/collections"
 import { LocalStorageKeys } from "@app/utils/defaults"
+import { Rule } from "@app/utils/rules"
 
 export const FeedDataProvider = ({ children }: PropsWithChildren<object>) => {
   const [storedFeedData, setStoredFeedData] = useLocalStorage(

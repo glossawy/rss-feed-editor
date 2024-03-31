@@ -1,8 +1,7 @@
+import { FormControl, FormLabel, Input, Stack } from "@mui/joy"
 import { z } from "zod"
-import { FormControl, FormLabel, Stack } from "@mui/joy"
 
 import { ContainsCondition } from "@app/utils/rules"
-import DebouncedInput from "@app/components/DebounceInput"
 
 import { ConditionFormProps } from "."
 
@@ -14,7 +13,7 @@ export default function ContainsForm({
     <Stack spacing={1}>
       <FormControl>
         <FormLabel>XPath</FormLabel>
-        <DebouncedInput
+        <Input
           value={condition.xpath}
           placeholder="Blank means within self"
           onChange={(e) => onChange({ ...condition, xpath: e.target.value })}
@@ -22,7 +21,7 @@ export default function ContainsForm({
       </FormControl>
       <FormControl>
         <FormLabel>Match Text</FormLabel>
-        <DebouncedInput
+        <Input
           value={condition.args.value}
           onChange={(e) =>
             onChange({ ...condition, args: { value: e.target.value } })
