@@ -14,7 +14,7 @@ function App() {
 
   return (
     <CssVarsProvider
-      colorSchemeNode={document.body}
+      colorSchemeNode={document.getElementById("joy-target")!}
       colorSchemeSelector="body"
       defaultMode={colorMode}
       disableNestedContext
