@@ -3,8 +3,6 @@ import { z } from "zod"
 const emptyObject = (errorMessage: string = "Expected empty object") => {
   return z.custom<Record<string, never>>(
     (data) => {
-      console.log(data)
-
       if (typeof data === "object" && data != null) {
         return Object.keys(data).length === 0
       } else {

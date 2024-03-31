@@ -7,7 +7,6 @@ export function useDebouncedValue<T>(value: T, wait: number) {
   const cancel = useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
   }, [])
-  console.log("debounced")
 
   useEffect(() => {
     cancel()

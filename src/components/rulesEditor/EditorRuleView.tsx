@@ -69,7 +69,6 @@ function RuleView({
     [onChange, rule]
   )
 
-  console.log(rule)
   return (
     <Box sx={{ maxHeight: "100%", overflow: "scroll" }}>
       <FormControl sx={{ padding: 1 }}>

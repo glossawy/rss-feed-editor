@@ -19,7 +19,6 @@
       if (window.localStorage) {
         const colorMode = window.localStorage.getItem('color-mode') || 'light'
 
-        console.log(colorMode)
         if (colorMode === '"dark"')
           document.getElementById('joy-target').classList.add('initial-dark-mode')
       }
