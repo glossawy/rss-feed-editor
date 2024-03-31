@@ -173,7 +173,7 @@ def _feedify_simple_dict(simple_dict: dict) -> FeedRulesDict:
         }
 
         if KEY_MINIFY_MAP["xpath"] in simple_mutation:
-            return {**mut_dict, "xpath": simple_mutation["xpath"]}
+            return {**mut_dict, "xpath": simple_mutation[KEY_MINIFY_MAP["xpath"]]}
 
         return mut_dict
 
