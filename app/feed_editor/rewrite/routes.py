@@ -3,7 +3,7 @@ import gzip
 import json
 
 from typing import Mapping
-from flask import Blueprint, request
+from flask import current_app, Blueprint, request
 
 from werkzeug.exceptions import BadRequest
 
@@ -20,6 +20,8 @@ def get():
 
     if not feed_rewriter.is_valid_feed:
         return "Feed URL must be a valid url", 400
+
+    current_app.logger.info(f"Rewrote feed for {feed_rewriter.feed_url}")
 
     return (
         feed_rewriter.rewritten_feed.as_xml(),

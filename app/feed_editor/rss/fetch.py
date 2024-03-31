@@ -13,7 +13,7 @@ def fetch_feed(rss_feed_url: str) -> Feed:
     if not validators.url(rss_feed_url):
         raise FeedError(f"Feed URL is not a valid URL, for {rss_feed_url}")
 
-    resp = httpx.get(rss_feed_url)
+    resp = httpx.get(rss_feed_url, follow_redirects=True)
 
     if not resp.is_success:
         raise FeedError(
