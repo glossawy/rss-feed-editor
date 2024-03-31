@@ -1,8 +1,7 @@
-import { PropsWithChildren, useReducer } from "react"
+import { PropsWithChildren, useCallback } from "react"
 
 import collections from "@app/utils/collections"
 import { Rule } from "@app/utils/rules"
-
 import {
   FeedAction,
   FeedData,
@@ -10,17 +9,27 @@ import {
   FeedDataDispatchContext,
   RuleWithMetadata,
   initialFeedData,
-} from "../contexts/feedData"
+} from "@app/hooks/feedData"
+import useLocalStorage from "@app/hooks/localStorage"
+import { LocalStorageKeys } from "@app/utils/defaults"
 
 export const FeedDataProvider = ({ children }: PropsWithChildren<object>) => {
-  const [feedData, feedDataDispatch] = useReducer(
-    feedDataReducer,
+  const [storedFeedData, setStoredFeedData] = useLocalStorage(
+    LocalStorageKeys.feedData,
     initialFeedData
   )
 
+  const storedFeedDataDispatch = useCallback(
+    (action: FeedAction) => {
+      const newFeed = feedDataReducer(storedFeedData, action)
+      setStoredFeedData(newFeed)
+    },
+    [storedFeedData, setStoredFeedData]
+  )
+
   return (
-    <FeedDataContext.Provider value={feedData}>
-      <FeedDataDispatchContext.Provider value={feedDataDispatch}>
+    <FeedDataContext.Provider value={storedFeedData}>
+      <FeedDataDispatchContext.Provider value={storedFeedDataDispatch}>
         {children}
       </FeedDataDispatchContext.Provider>
     </FeedDataContext.Provider>
@@ -80,5 +89,7 @@ function feedDataReducer(feedData: FeedData, action: FeedAction): FeedData {
           rule.id === action.ruleId ? action.rule : rule
         ),
       }
+    case "clear":
+      return { feedUrl: feedData.feedUrl, rules: initialFeedData.rules }
   }
 }

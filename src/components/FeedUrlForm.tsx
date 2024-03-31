@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form"
 import { FormControl, FormLabel, Input } from "@mui/joy"
 import { useCallback } from "react"
 
-import { useFeedData, useFeedDataDispatch } from "@app/contexts/feedData"
+import { useFeedData, useFeedDataDispatch } from "@app/hooks/feedData"
 
 export type FormValues = {
   feedUrl: string

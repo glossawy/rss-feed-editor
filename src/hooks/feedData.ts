@@ -11,6 +11,7 @@ export type FeedAction =
   | { type: "replace"; ruleId: number; rule: Rule }
   | { type: "shiftUp"; ruleId: number }
   | { type: "shiftDown"; ruleId: number }
+  | { type: "clear" }
 
 export type RuleWithMetadata = {
   id: number

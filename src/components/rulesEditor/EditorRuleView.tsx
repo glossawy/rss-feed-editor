@@ -11,7 +11,7 @@ import {
 } from "@mui/joy"
 import { useCallback } from "react"
 
-import { RuleWithMetadata } from "@app/contexts/feedData"
+import { RuleWithMetadata } from "@app/hooks/feedData"
 import { Condition, Mutation, Rule } from "@app/utils/rules"
 import DebouncedInput from "@app/components/DebounceInput"
 

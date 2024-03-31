@@ -5,9 +5,25 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RSS Feed Transformer</title>
+    <style>
+      #joy-target.initial-dark-mode:not([data-joy-color-scheme]) {
+        background-color: #051423;
+      }
+    </style>
   </head>
-  <body>
+  <body id="joy-target">
     <div id="root"></div>
+    <script>
+      // Handle background color if color scheme saved is dark, so we dont blind someone
+      // with a flash of white.
+      if (window.localStorage) {
+        const colorMode = window.localStorage.getItem('color-mode') || 'light'
+
+        console.log(colorMode)
+        if (colorMode === '"dark"')
+          document.getElementById('joy-target').classList.add('initial-dark-mode')
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

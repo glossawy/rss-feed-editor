@@ -1,6 +1,6 @@
 import { Sheet } from "@mui/joy"
 
-import { RuleWithMetadata } from "@app/contexts/feedData"
+import { RuleWithMetadata } from "@app/hooks/feedData"
 import OrderedCardList from "@app/components/OrderedCardList"
 import EditableLabel from "@app/components/EditableLabel"
 

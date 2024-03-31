@@ -5,7 +5,7 @@ import {
   RuleWithMetadata,
   useFeedData,
   useFeedDataDispatch,
-} from "@app/contexts/feedData"
+} from "@app/hooks/feedData"
 import { DefaultFactories } from "@app/utils/defaults"
 import { Rule } from "@app/utils/rules"
 

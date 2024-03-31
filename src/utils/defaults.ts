@@ -1,5 +1,10 @@
 import { Condition, Mutation, Rule } from "./rules"
 
+export const LocalStorageKeys = {
+  colorMode: "color-mode", // change with caution, used in index.html
+  feedData: "feed-data:v1",
+} as const
+
 export const DefaultFactories = {
   mutations: {
     remove(): Mutation {

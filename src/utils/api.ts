@@ -1,6 +1,6 @@
 import { useQuery } from "react-query"
 
-import { useFeedData } from "@app/contexts/feedData"
+import { useFeedData } from "@app/hooks/feedData"
 
 import type { FeedTransform } from "./rules"
 
