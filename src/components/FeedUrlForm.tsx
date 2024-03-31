@@ -23,7 +23,11 @@ export default function FeedUrlForm() {
     [setUrl]
   )
 
-  const { onBlur: onFeedUrlBlur, ...feedUrlProps } = register("feedUrl")
+  const {
+    onBlur: onFeedUrlBlur,
+    onChange: onFeedUrlChange,
+    ...feedUrlProps
+  } = register("feedUrl")
 
   const onBlur = useCallback(
     (evt: React.FocusEvent<HTMLInputElement>) => {
@@ -33,6 +37,14 @@ export default function FeedUrlForm() {
     [onFeedUrlBlur, setUrl]
   )
 
+  const onChange = useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      setUrl(evt.target.value)
+      onFeedUrlChange(evt)
+    },
+    [onFeedUrlChange, setUrl]
+  )
+
   return (
     <form id="rss-inputs" onSubmit={handleSubmit(onSubmit)}>
       <FormControl>
@@ -40,6 +52,7 @@ export default function FeedUrlForm() {
         <Input
           {...feedUrlProps}
           onBlur={onBlur}
+          onChange={onChange}
           defaultValue={feedUrl}
           type="url"
         />
