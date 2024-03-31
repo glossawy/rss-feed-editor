@@ -15,4 +15,6 @@ COPY ./README.md /app
 
 RUN pip install .
 
-CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "feed_editor:create_app()"]
+COPY ./gunicorn.conf.py /app
+
+CMD ["gunicorn", "-c", "/app/gunicorn.conf.py", "feed_editor:create_app()"]

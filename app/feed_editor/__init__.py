@@ -15,7 +15,7 @@ def create_app() -> Flask:  # pylint: disable=missing-function-docstring
     if os.environ.get("APP_DISABLE_CORS", "0") == "1":
         CORS(app)
 
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=2, x_proto=2, x_host=2, x_prefix=2)
 
     blueprints: list[Blueprint] = [
         rewrite.blueprint,
