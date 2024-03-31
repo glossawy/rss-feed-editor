@@ -1,9 +1,15 @@
 
-build:
-	npm run build
+lint:
+	bun lint --fix
 
-start-locally: build
+build: lint
+	bun run build
+
+start: build
 	docker compose up
+
+dev-frontend:
+	bun run dev
 
 dev-server:
 	poetry run -C ./app flask -A feed_editor --debug run
