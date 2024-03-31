@@ -2,6 +2,10 @@
 lint-frontend:
 	bun lint --fix
 
+lint-backend:
+	poetry run pylint ./app
+	poetry run flake8 ./app
+
 build-frontend: lint-frontend
 	bun run build
 

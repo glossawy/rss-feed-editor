@@ -1,12 +1,9 @@
-import base64
-import gzip
-import json
-
 from typing import Mapping
 from flask import current_app, Blueprint, request
 
 from werkzeug.exceptions import BadRequest
 
+from feed_editor.rewrite.compression import compress_and_encode, decode_and_decompress
 from feed_editor.rewrite.rewriter import FeedRewriter
 from feed_editor.rewrite.rules import validate_dict, validate_xpaths
 from feed_editor.rewrite.rules.types import FeedRulesDict
@@ -51,29 +48,13 @@ def url():
     if not validate_xpaths(feed_dict):
         return "Invalid xpaths", 400
 
-    return _url_encode_rules(feed_dict)
+    return compress_and_encode(feed_dict)
 
 
 def _parse_args(params: Mapping[str, str]) -> FeedRulesDict:
     feed_data_gzipped: str | None = params.get("r", None)
 
     if feed_data_gzipped:
-        return _url_decode_rules(feed_data_gzipped)
+        return decode_and_decompress(feed_data_gzipped)
 
     raise BadRequest()
-
-
-def _url_encode_rules(feed_dict: FeedRulesDict) -> str:
-    feed_json = json.dumps(feed_dict)
-    compressed = gzip.compress(feed_json.encode("utf-8"))
-    encoded = base64.urlsafe_b64encode(compressed).decode("utf-8")
-
-    return encoded
-
-
-def _url_decode_rules(encoded: str) -> FeedRulesDict:
-    compressed = base64.urlsafe_b64decode(encoded)
-    feed_json = gzip.decompress(compressed).decode("utf-8")
-    feed_dict = json.loads(feed_json)
-
-    return validate_dict(feed_dict)
