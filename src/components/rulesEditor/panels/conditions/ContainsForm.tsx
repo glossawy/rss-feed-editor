@@ -16,7 +16,7 @@ export default function ContainsForm({
         <FormLabel>XPath</FormLabel>
         <DebouncedInput
           value={condition.xpath}
-          placeholder="Blank means remove self"
+          placeholder="Blank means within self"
           onChange={(e) => onChange({ ...condition, xpath: e.target.value })}
         />
       </FormControl>

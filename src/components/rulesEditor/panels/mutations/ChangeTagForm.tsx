@@ -15,7 +15,7 @@ export default function ChangeTagForm({ mutation, onChange }: Props) {
         <FormLabel>XPath</FormLabel>
         <DebouncedInput
           value={mutation.xpath}
-          placeholder="Blank means remove self"
+          placeholder="Blank means change self"
           onChange={(e) => onChange({ ...mutation, xpath: e.target.value })}
         />
       </FormControl>

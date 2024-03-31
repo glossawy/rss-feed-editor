@@ -19,7 +19,7 @@ export default function ReplaceForm({ mutation, onChange }: Props) {
         <FormLabel>XPath</FormLabel>
         <Input
           value={mutation.xpath}
-          placeholder="Blank means remove self"
+          placeholder="Blank means replace self"
           onChange={(e) => onChange({ ...mutation, xpath: e.target.value })}
         />
       </FormControl>
