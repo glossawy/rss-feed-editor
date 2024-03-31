@@ -1,7 +1,8 @@
 import functools
+import re
+
 from typing import Protocol, Callable
 from typing_extensions import TypedDict
-import re
 
 from lxml import etree
 from feed_editor.utils.dict_validation import validate_typed_dict, _TypedDict_T
@@ -21,7 +22,7 @@ def _require_args(dict_type: type[_TypedDict_T]):
 
 
 class RemoveArgs(TypedDict):
-    pass
+    """Args for the remove mutation"""
 
 
 @_require_args(RemoveArgs)
@@ -33,6 +34,8 @@ def _remove(element: etree._Element, _args: RemoveArgs, /):
 
 
 class ReplaceArgs(TypedDict):
+    """Args for the replace mutation"""
+
     pattern: str
     replacement: str
     trim: bool
@@ -53,6 +56,8 @@ def _replace(element: etree._Element, args: ReplaceArgs, /):
 
 
 class ChangeTagArgs(TypedDict):
+    """args for the change tag mutation"""
+
     tag: str
 
 
@@ -64,13 +69,16 @@ def _change_tag(element: etree._Element, args: ChangeTagArgs, /):
 MutationArgs = ReplaceArgs | RemoveArgs | ChangeTagArgs
 
 
-class MutationFn(Protocol):
+class MutationFn(Protocol):  # pylint: disable=too-few-public-methods
+    """Required signature for mutations"""
+
     @staticmethod
-    def __call__(element: etree._Element, args: MutationArgs, /) -> None:
-        ...
+    def __call__(element: etree._Element, args: MutationArgs, /) -> None: ...
 
 
 class Mutation(TypedDict):
+    """Base TypedDict for all mutations"""
+
     display_name: str
     definition: MutationFn
     arg_spec: type[MutationArgs]

@@ -5,11 +5,10 @@ from flask_cors import CORS
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-import feed_editor.rewrite as rewrite
-import feed_editor.health_check as health_check
+from feed_editor import rewrite, health_check
 
 
-def create_app() -> Flask:
+def create_app() -> Flask:  # pylint: disable=missing-function-docstring
     app = Flask(__name__, instance_relative_config=True)
 
     # Allow all for CORS only if env var set
@@ -23,7 +22,7 @@ def create_app() -> Flask:
         health_check.blueprint,
     ]
 
-    for bp in blueprints:
-        app.register_blueprint(bp)
+    for blueprint in blueprints:
+        app.register_blueprint(blueprint)
 
     return app

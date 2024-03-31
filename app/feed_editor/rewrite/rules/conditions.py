@@ -19,6 +19,8 @@ def _require_args(dict_type: type[_TypedDict_T]):
 
 
 class ContainsArgs(TypedDict):
+    """Arguments to the contains condition"""
+
     value: str
 
 
@@ -30,13 +32,16 @@ def _contains(feed_value: str, args: ContainsArgs, /) -> bool:
 ConditionArgs = ContainsArgs
 
 
-class ConditionFn(Protocol):
+class ConditionFn(Protocol):  # pylint: disable=too-few-public-methods
+    """Required signature for a condition"""
+
     @staticmethod
-    def __call__(value: str, args: ConditionArgs, /) -> bool:
-        ...
+    def __call__(value: str, args: ConditionArgs, /) -> bool: ...
 
 
 class Condition(TypedDict):
+    """Base TypedDict for a Condition"""
+
     display_name: str
     definition: ConditionFn
     arg_spec: type[ConditionArgs]

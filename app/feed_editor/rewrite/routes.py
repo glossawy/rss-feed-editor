@@ -16,6 +16,7 @@ rewrite_api = Blueprint("rewrite", __name__, url_prefix="/rewrite")
 
 @rewrite_api.route("/", methods=["GET"])
 def get():
+    """Takes feed rules for a url and returns the rewritten feed as an XML string"""
     feed_rewriter = FeedRewriter(_parse_args(request.args))
 
     if not feed_rewriter.is_valid_feed:
@@ -32,6 +33,9 @@ def get():
 
 @rewrite_api.route("/url", methods=["POST"])
 def url():
+    """Takes a url and feed transformations and returns a URL-safe compressed and
+    encoded representation
+    """
     request_json = request.json
 
     if (
@@ -55,8 +59,8 @@ def _parse_args(params: Mapping[str, str]) -> FeedRulesDict:
 
     if feed_data_gzipped:
         return _url_decode_rules(feed_data_gzipped)
-    else:
-        raise BadRequest()
+
+    raise BadRequest()
 
 
 def _url_encode_rules(feed_dict: FeedRulesDict) -> str:

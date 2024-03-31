@@ -1,3 +1,6 @@
+# flake8: noqa
+# pylint: skip-file
+
 from typing_extensions import TypedDict
 
 from .conditions import ConditionArgs
