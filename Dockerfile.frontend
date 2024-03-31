@@ -1,0 +1,7 @@
+FROM caddy:2-alpine
+
+EXPOSE 80
+
+RUN mkdir -p /var/www/app
+COPY ./dist /var/www/app/html
+COPY ./caddyfiles/Caddyfile.prod /etc/caddy/Caddyfile

@@ -1,0 +1,11 @@
+:80 {
+	handle_path /api/* {
+		reverse_proxy {$API_HOST}:5000
+	}
+
+	root * /var/www/app/html
+	reverse_proxy /rewrite/* {$API_HOST}:5000
+
+	encode gzip
+	file_server
+}

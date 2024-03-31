@@ -20,7 +20,7 @@ services:
     depends_on:
       - app
     volumes:
-      - ./dev/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddyfiles/Caddyfile.dev:/etc/caddy/Caddyfile
       - ./dist:/var/www/app/html
     networks:
       - dev
