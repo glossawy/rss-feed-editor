@@ -8,7 +8,7 @@ readme = "README.md"
 packages = [{ include = 'feed_editor', from = 'app' }]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 Flask = "^2.3.3"
 flask-cors = "^4.0.0"
 lxml = "^4.9.3"
