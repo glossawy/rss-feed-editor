@@ -2,7 +2,7 @@ import httpx
 import validators  # type: ignore
 from lxml import etree
 
-from .models import Feed, FeedType
+from .models import Feed
 
 
 class FeedError(RuntimeError):  # pylint: disable=missing-class-docstring
@@ -38,13 +38,4 @@ def fetch_feed(rss_feed_url: str) -> Feed:
     parser = etree.XMLParser()
     root = etree.fromstring(resp.text.encode("utf-8"), parser)
 
-    tag: str = root.tag
-
-    if "atom" in tag.lower() or "feed" in tag.lower():
-        feed_type = FeedType.ATOM
-    elif "rss" in tag.lower():
-        feed_type = FeedType.RSS
-    else:
-        raise FeedError(f"Unknown feed type for tag: {tag}")
-
-    return Feed(etree.ElementTree(root), feed_type)
+    return Feed.from_root(root)

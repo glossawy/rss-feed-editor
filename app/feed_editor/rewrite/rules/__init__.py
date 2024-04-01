@@ -4,7 +4,7 @@ from typing import cast
 from lxml import etree
 
 from feed_editor.utils.dict_validation import validate_dict as generic_validate_dict
-from feed_editor.xpath import ns_aware_find, ns_aware_findall
+from feed_editor.utils.xpath import ns_aware_find, ns_aware_findall
 
 from .conditions import conditions_map
 from .mutations import mutation_map

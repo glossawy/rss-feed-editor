@@ -5,7 +5,7 @@ from typing import Protocol, Callable
 from typing_extensions import TypedDict
 
 from lxml import etree
-from feed_editor.utils.dict_validation import validate_typed_dict, _TypedDict_T
+from feed_editor.utils.dict_validation import validate_dict, _TypedDict_T
 
 
 def _require_args(dict_type: type[_TypedDict_T]):
@@ -14,7 +14,7 @@ def _require_args(dict_type: type[_TypedDict_T]):
     ) -> Callable[[etree._Element, "MutationArgs"], None]:
         @functools.wraps(operation)
         def decorated(elem, args: "MutationArgs"):
-            operation(elem, validate_typed_dict(dict_type, args))
+            operation(elem, validate_dict(dict_type, args))
 
         return decorated
 

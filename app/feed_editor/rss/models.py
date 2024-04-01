@@ -20,6 +20,19 @@ class Feed:
     tree: etree._ElementTree
     feed_type: FeedType
 
+    @classmethod
+    def from_root(cls, root: etree._Element) -> "Feed":
+        tag_name = root.tag.lower()
+
+        if tag_name.endswith("rss"):
+            feed_type = FeedType.RSS
+        elif tag_name.endswith("feed"):
+            feed_type = FeedType.ATOM
+        else:
+            raise RuntimeError(f"Unknown feed root tag: {tag_name}")
+
+        return cls(etree.ElementTree(root), feed_type)
+
     def copy(self) -> "Feed":
         """Returns a copy of the feed with a structurally identical etree
 

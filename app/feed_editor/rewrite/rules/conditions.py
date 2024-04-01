@@ -2,7 +2,7 @@ import functools
 from typing import Protocol, Callable
 from typing_extensions import TypedDict
 
-from feed_editor.utils.dict_validation import _TypedDict_T, validate_typed_dict
+from feed_editor.utils.dict_validation import _TypedDict_T, validate_dict
 
 
 def _require_args(dict_type: type[_TypedDict_T]):
@@ -11,7 +11,7 @@ def _require_args(dict_type: type[_TypedDict_T]):
     ) -> Callable[[str, "ConditionArgs"], bool]:
         @functools.wraps(predicate)
         def decorated(value, args: "ConditionArgs"):
-            return predicate(value, validate_typed_dict(dict_type, args))
+            return predicate(value, validate_dict(dict_type, args))
 
         return decorated
 
