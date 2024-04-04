@@ -2,11 +2,8 @@ import httpx
 import validators  # type: ignore
 from lxml import etree
 
-from .models import Feed
-
-
-class FeedError(RuntimeError):  # pylint: disable=missing-class-docstring
-    pass
+from feed_editor.rss.errors import FeedError
+from feed_editor.rss.models import Feed
 
 
 def fetch_feed(rss_feed_url: str) -> Feed:
@@ -35,7 +32,11 @@ def fetch_feed(rss_feed_url: str) -> Feed:
             f"Feed unavailable, returned {resp.status_code} response, for {rss_feed_url}"
         )
 
-    parser = etree.XMLParser()
-    root = etree.fromstring(resp.text.encode("utf-8"), parser)
-
-    return Feed.from_root(root)
+    try:
+        parser = etree.XMLParser()
+        root = etree.fromstring(resp.text.encode("utf-8"), parser)
+        return Feed.from_root(root)
+    except etree.XMLSyntaxError as exc:
+        raise FeedError(
+            f"Response from {rss_feed_url} does not contain a valid feed"
+        ) from exc

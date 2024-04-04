@@ -5,6 +5,8 @@ import enum
 
 from lxml import etree
 
+from feed_editor.rss.errors import FeedError
+
 
 class FeedType(enum.Enum):
     """Type of feed"""
@@ -29,7 +31,7 @@ class Feed:
         elif tag_name.endswith("feed"):
             feed_type = FeedType.ATOM
         else:
-            raise RuntimeError(f"Unknown feed root tag: {tag_name}")
+            raise FeedError(f"Unknown feed root tag: {tag_name}")
 
         return cls(etree.ElementTree(root), feed_type)
 

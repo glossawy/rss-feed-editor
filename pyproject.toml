@@ -28,6 +28,8 @@ types-flask-cors = "^4.0.0.20240106"
 [tool.pytest.ini_options]
 minversion = "6.0"
 testpaths = ["app/tests"]
+norecursedirs = ["app/tests/support"]
+pythonpath = ["app/tests/support"]
 
 [tool.mypy]
 check_untyped_defs = true

@@ -1,8 +1,7 @@
-from typing import Callable
-
 import pytest
 from feed_editor.rss.models import Feed, FeedType
-from lxml.etree import _ElementTree as ElementTree
+
+from tests.support.fixture_types import FeedTreeFactory, FeedFactory
 
 
 @pytest.mark.parametrize(
@@ -12,9 +11,7 @@ from lxml.etree import _ElementTree as ElementTree
         ("rss", FeedType.RSS),
     ],
 )
-def test_feed_from_root(
-    feed_tree_factory: Callable[[str], ElementTree], fixture_name, feed_type
-):
+def test_feed_from_root(feed_tree_factory: FeedTreeFactory, fixture_name, feed_type):
     tree = feed_tree_factory(fixture_name)
     feed = Feed.from_root(tree.getroot())
 
@@ -22,7 +19,7 @@ def test_feed_from_root(
     assert feed.tree.getroot() is tree.getroot()
 
 
-def test_feed_copy(feed_factory: Callable[[str], Feed]):
+def test_feed_copy(feed_factory: FeedFactory):
     feed = feed_factory("rss")
     copied = feed.copy()
 

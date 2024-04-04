@@ -7,14 +7,16 @@ import pytest
 from feed_editor.rss.models import Feed
 from lxml import etree
 
+from tests.support.fixture_types import FeedFactory, FeedTreeFactory, FeedXmlLoader
+
 FIXTURES_PATH = Path(__file__).joinpath("..", "fixtures").resolve()
 
 
 @pytest.fixture
-def feed_xml_loader():
-    def loader(name: str):
-        if not name.endswith(".xml"):
-            name = f"{name}.xml"
+def feed_xml_loader() -> FeedXmlLoader:
+    def loader(feed_fixture_name: str):
+        if not feed_fixture_name.endswith(".xml"):
+            name = f"{feed_fixture_name}.xml"
 
         with open(FIXTURES_PATH.joinpath(name), "r", encoding="utf-8") as feed:
             return feed.read()
@@ -23,19 +25,19 @@ def feed_xml_loader():
 
 
 @pytest.fixture
-def feed_tree_factory(feed_xml_loader):
-    def factory(name: str):
+def feed_tree_factory(feed_xml_loader) -> FeedTreeFactory:
+    def factory(feed_fixture_name: str):
         xmlparser = etree.XMLParser()
-        xml = feed_xml_loader(name).encode("utf-8")
+        xml = feed_xml_loader(feed_fixture_name).encode("utf-8")
         return etree.ElementTree(cast(etree._Element, etree.fromstring(xml, xmlparser)))
 
     return factory
 
 
 @pytest.fixture
-def feed_factory(feed_tree_factory):
-    def factory(name: str):
-        tree = cast(etree._ElementTree, feed_tree_factory(name))
+def feed_factory(feed_tree_factory) -> FeedFactory:
+    def factory(feed_fixture_name: str):
+        tree = cast(etree._ElementTree, feed_tree_factory(feed_fixture_name))
         return Feed.from_root(tree.getroot())
 
     return factory
