@@ -95,7 +95,7 @@ def _change_tag_testval(xpath: str) -> "MutationDict":
 MutationArgs = ReplaceArgs | ChangeTagArgs | RemoveArgs
 
 
-class MutationFn(Protocol):  # pylint: disable=too-few-public-methods
+class MutationFn(Protocol):
     """Required signature for mutations"""
 
     @staticmethod
