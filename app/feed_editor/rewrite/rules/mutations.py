@@ -1,11 +1,13 @@
 import functools
 import re
 
-from typing import Protocol, Callable
-from typing_extensions import TypedDict
+from typing import Protocol, Callable, TypedDict, TYPE_CHECKING
 
 from lxml import etree
 from feed_editor.utils.dict_validation import validate_dict, _TypedDict_T
+
+if TYPE_CHECKING:
+    from .types import MutationDict
 
 
 def _require_args(dict_type: type[_TypedDict_T]):
@@ -33,6 +35,10 @@ def _remove(element: etree._Element, _args: RemoveArgs, /):
         parent.remove(element)
 
 
+def _remove_testval(xpath: str) -> "MutationDict":
+    return {"xpath": xpath, "name": "remove", "args": {}}
+
+
 class ReplaceArgs(TypedDict):
     """Args for the replace mutation"""
 
@@ -55,6 +61,18 @@ def _replace(element: etree._Element, args: ReplaceArgs, /):
     element.text = elem_text
 
 
+def _replace_testval(xpath: str) -> "MutationDict":
+    return {
+        "xpath": xpath,
+        "name": "replace",
+        "args": {
+            "pattern": ".+?testpattern.+?",
+            "replacement": "test replacement",
+            "trim": False,
+        },
+    }
+
+
 class ChangeTagArgs(TypedDict):
     """args for the change tag mutation"""
 
@@ -66,7 +84,15 @@ def _change_tag(element: etree._Element, args: ChangeTagArgs, /):
     element.tag = args["tag"]
 
 
-MutationArgs = ReplaceArgs | RemoveArgs | ChangeTagArgs
+def _change_tag_testval(xpath: str) -> "MutationDict":
+    return {"xpath": xpath, "name": "changeTag", "args": {"tag": "test"}}
+
+
+# Order matters here!! Pydantic will coerce the dict to the one matched first,
+# leave RemoveArgs at end, otherwise args will be removed for other mutations.
+#
+# This is a limitation of python typing... or at least how I typed things here.
+MutationArgs = ReplaceArgs | ChangeTagArgs | RemoveArgs
 
 
 class MutationFn(Protocol):  # pylint: disable=too-few-public-methods
@@ -76,18 +102,39 @@ class MutationFn(Protocol):  # pylint: disable=too-few-public-methods
     def __call__(element: etree._Element, args: MutationArgs, /) -> None: ...
 
 
+class TestFactory(Protocol):
+    def __call__(self, xpath: str) -> "MutationDict": ...
+
+
 class Mutation(TypedDict):
     """Base TypedDict for all mutations"""
 
     display_name: str
     definition: MutationFn
     arg_spec: type[MutationArgs]
+    test_factory: TestFactory
 
 
 mutation_list: list[Mutation] = [
-    {"display_name": "remove", "definition": _remove, "arg_spec": RemoveArgs},
-    {"display_name": "replace", "definition": _replace, "arg_spec": ReplaceArgs},
-    {"display_name": "changeTag", "definition": _change_tag, "arg_spec": ChangeTagArgs},
+    {
+        "display_name": "remove",
+        "definition": _remove,
+        "arg_spec": RemoveArgs,
+        "test_factory": _remove_testval,
+    },
+    {
+        "display_name": "replace",
+        "definition": _replace,
+        "arg_spec": ReplaceArgs,
+        "test_factory": _replace_testval,
+    },
+    {
+        "display_name": "changeTag",
+        "definition": _change_tag,
+        "arg_spec": ChangeTagArgs,
+        "test_factory": _change_tag_testval,
+    },
 ]
+
 
 mutation_map: dict[str, Mutation] = {mut["display_name"]: mut for mut in mutation_list}

@@ -1,8 +1,10 @@
 import functools
-from typing import Protocol, Callable
-from typing_extensions import TypedDict
+from typing import Protocol, Callable, TypedDict, TYPE_CHECKING
 
 from feed_editor.utils.dict_validation import _TypedDict_T, validate_dict
+
+if TYPE_CHECKING:
+    from .types import ConditionDict
 
 
 def _require_args(dict_type: type[_TypedDict_T]):
@@ -29,6 +31,10 @@ def _contains(feed_value: str, args: ContainsArgs, /) -> bool:
     return args["value"] in feed_value
 
 
+def _contains_testval(xpath: str) -> "ConditionDict":
+    return {"xpath": xpath, "name": "contains", "args": {"value": "test value"}}
+
+
 ConditionArgs = ContainsArgs
 
 
@@ -39,16 +45,26 @@ class ConditionFn(Protocol):  # pylint: disable=too-few-public-methods
     def __call__(value: str, args: ConditionArgs, /) -> bool: ...
 
 
+class TestFactory(Protocol):
+    def __call__(self, xpath: str) -> "ConditionDict": ...
+
+
 class Condition(TypedDict):
     """Base TypedDict for a Condition"""
 
     display_name: str
     definition: ConditionFn
     arg_spec: type[ConditionArgs]
+    test_factory: TestFactory
 
 
 all_conditions: list[Condition] = [
-    {"display_name": "contains", "definition": _contains, "arg_spec": ContainsArgs}
+    {
+        "display_name": "contains",
+        "definition": _contains,
+        "arg_spec": ContainsArgs,
+        "test_factory": _contains_testval,
+    }
 ]
 
 conditions_map: dict[str, Condition] = {
