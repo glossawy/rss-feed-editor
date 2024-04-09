@@ -20,10 +20,12 @@ def test_typed_dict_class():
 @pytest.mark.parametrize(
     "test_dict",
     [
-        pytest.param({}, marks=pytest.mark.xfail),
-        pytest.param({"a": "test", "b": 2}),
-        pytest.param({"a": "test", "b": 2, "c": 3}, marks=pytest.mark.xfail),
-        pytest.param({"a": "test", "b": 2, "c": "c"}),
+        pytest.param({}, marks=pytest.mark.xfail, id="empty-dict"),
+        pytest.param({"a": "test", "b": 2}, id="field-not-required"),
+        pytest.param(
+            {"a": "test", "b": 2, "c": 3}, marks=pytest.mark.xfail, id="invalid-type"
+        ),
+        pytest.param({"a": "test", "b": 2, "c": "c"}, id="valid"),
     ],
 )
 def test_validate_dict(test_typed_dict_class, test_dict: Mapping):
@@ -33,10 +35,10 @@ def test_validate_dict(test_typed_dict_class, test_dict: Mapping):
 @pytest.mark.parametrize(
     "test_dict,is_valid",
     [
-        pytest.param({}, False),
-        pytest.param({"a": "test", "b": 2}, True),
-        pytest.param({"a": "test", "b": 2, "c": 3}, False),
-        pytest.param({"a": "test", "b": 2, "c": "c"}, True),
+        pytest.param({}, False, id="invalid-empty-dict"),
+        pytest.param({"a": "test", "b": 2}, True, id="valid-field-not-required"),
+        pytest.param({"a": "test", "b": 2, "c": 3}, False, id="invalid-type"),
+        pytest.param({"a": "test", "b": 2, "c": "c"}, True, id="valid"),
     ],
 )
 def test_dict_validator(test_typed_dict_class, test_dict: Mapping, is_valid):
