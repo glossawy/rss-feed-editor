@@ -1,5 +1,5 @@
 import copy
-from typing import cast
+from typing import Mapping
 
 from lxml import etree
 
@@ -11,10 +11,9 @@ from .mutations import mutation_map
 from .types import AndDict, ConditionDict, FeedRulesDict, MutationDict, OrDict, RuleDict
 
 
-def validate_dict(test_dict: dict):
+def validate_dict(test_dict: Mapping) -> FeedRulesDict:
     """Validate that a dictionary represents a feed and rules to apply to it (FeedRulesDict)"""
-    generic_validate_dict(FeedRulesDict, test_dict)
-    return cast(FeedRulesDict, test_dict)
+    return generic_validate_dict(FeedRulesDict, test_dict)
 
 
 def validate_xpaths(feed_rules: FeedRulesDict) -> bool:
