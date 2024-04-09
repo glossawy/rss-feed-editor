@@ -2,6 +2,7 @@ import dataclasses
 from functools import cached_property
 from typing import cast
 
+from feed_editor.rss.errors import FeedError
 import validators  # type: ignore
 from feed_editor.rewrite.rules import run_rule
 from feed_editor.rewrite.rules.types import FeedRulesDict
@@ -53,4 +54,4 @@ class FeedRewriter:
             case FeedType.ATOM:
                 return "application/atom+xml"
             case feed_type:
-                raise RuntimeError(f"No mime type known for {feed_type} feed")
+                raise FeedError(f"No mime type known for {feed_type} feed")

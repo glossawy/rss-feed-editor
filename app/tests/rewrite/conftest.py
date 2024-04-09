@@ -1,70 +1,62 @@
-import functools
 import random
 from typing import Literal, cast
 from feed_editor.rewrite.rules.types import (
+    AndDict,
     ConditionDict,
     FeedRulesDict,
     MutationDict,
+    OrDict,
     RuleDict,
 )
 import pytest
 
 from tests.support.fixture_types import (
-    ConditionAggregates,
-    ConditionContainsFactory,
+    ConditionFactories,
+    MutationFactories,
     FeedRulesFactory,
-    MutationRemoveFactory,
-    MutationReplaceFactory,
     RuleFactory,
 )
 
 
-@pytest.fixture
-def aggregate_conditions(
-    contains_factory: ConditionContainsFactory,
-) -> ConditionAggregates:
-    def factory(
+class _ConditionFactories(ConditionFactories):
+    def _aggregate_condition(
+        self,
         type: Literal["all_of"] | Literal["any_of"],
         conditions: int | list[ConditionDict] = 1,
-    ) -> ConditionDict:
+    ) -> AndDict | OrDict:
         if isinstance(conditions, int):
-            conditions = [contains_factory() for _ in range(conditions)]
+            conditions = [self._contains_factory() for _ in range(conditions)]
 
-        return cast(ConditionDict, {type: conditions})
+        if type == "all_of":
+            return {"all_of": conditions}
+        return {"any_of": conditions}
 
-    factory.all_of = functools.partial(factory, "all_of")
-    factory.any_of = functools.partial(factory, "any_of")
+    def all_of(self, conditions: int | list[ConditionDict] = 1) -> AndDict:
+        return cast(AndDict, self._aggregate_condition("all_of", conditions))
 
-    return cast(ConditionAggregates, factory)
+    def any_of(self, conditions: int | list[ConditionDict] = 1) -> OrDict:
+        return cast(OrDict, self._aggregate_condition("any_of", conditions))
 
-
-@pytest.fixture
-def contains_factory() -> ConditionContainsFactory:
-    def factory(xpath=None, contains=None) -> ConditionDict:
+    def _contains_factory(self, xpath=None, contains=None) -> ConditionDict:
         return {
             "xpath": xpath or "webMaster",
             "name": "contains",
             "args": {"value": contains or "Test"},
         }
 
-    return factory
+    def contains(
+        self, xpath: str | None = None, contains: str | None = None
+    ) -> ConditionDict:
+        return self._contains_factory(xpath, contains)
 
 
-@pytest.fixture
-def remove_factory() -> MutationRemoveFactory:
-    def factory(xpath=None) -> MutationDict:
-        return {
-            "xpath": xpath or "webMaster",
-            "name": "remove",
-            "args": {},
-        }
+class _MutationFactories(MutationFactories):
+    def remove(self, xpath: str | None = None) -> MutationDict:
+        return {"xpath": xpath or "webMaster", "name": "remove", "args": {}}
 
-    return factory
-
-
-@pytest.fixture
-def replace_factory() -> MutationReplaceFactory:
-    def factory(xpath=None, pattern=None, replacement=None, trim=False) -> MutationDict:
+    def replace(
+        self, xpath=None, pattern=None, replacement=None, trim=False
+    ) -> MutationDict:
         return {
             "xpath": xpath or "webMaster",
             "name": "replace",
@@ -75,27 +67,37 @@ def replace_factory() -> MutationReplaceFactory:
             },
         }
 
-    return factory
+
+@pytest.fixture
+def condition_factories() -> ConditionFactories:
+    return _ConditionFactories()
+
+
+@pytest.fixture
+def mutation_factories() -> MutationFactories:
+    return _MutationFactories()
 
 
 @pytest.fixture
 def rule_factory(
-    contains_factory: ConditionContainsFactory,
-    remove_factory: MutationRemoveFactory,
-    replace_factory: MutationReplaceFactory,
+    condition_factories: ConditionFactories, mutation_factories: MutationFactories
 ) -> RuleFactory:
     def factory(
         xpath=None, condition=None, mutations: int | list[MutationDict] = 1
     ) -> RuleDict:
         if isinstance(mutations, int):
             mutations = [
-                remove_factory() if random.random() < 0.5 else replace_factory()
+                (
+                    mutation_factories.remove()
+                    if random.random() < 0.5
+                    else mutation_factories.replace()
+                )
                 for _ in range(mutations)
             ]
 
         return {
             "xpath": xpath or "//channel/item",
-            "condition": condition or contains_factory(),
+            "condition": condition or condition_factories.contains(),
             "mutations": mutations,
         }
 

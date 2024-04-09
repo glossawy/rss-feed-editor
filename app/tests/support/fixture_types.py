@@ -1,10 +1,13 @@
-from typing import Callable, Literal, Protocol
+from typing import Callable, Protocol
 
 from feed_editor.rewrite.rules.types import (
+    AndDict,
     ConditionDict,
     FeedRulesDict,
     MutationDict,
+    OrDict,
     RuleDict,
+    SingleCondition,
 )
 from feed_editor.rss.models import Feed
 from lxml.etree import _ElementTree as ElementTree
@@ -26,28 +29,19 @@ class FeedFactory(Protocol):
     def __call__(self, feed_fixture_name: str) -> Feed: ...
 
 
-class ConditionContainsFactory(Protocol):
-    def __call__(
+class ConditionFactories(Protocol):
+    def all_of(self, conditions: int | list[ConditionDict] = 1) -> AndDict: ...
+    def any_of(self, conditions: int | list[ConditionDict] = 1) -> OrDict: ...
+
+    def contains(
         self, xpath: str | None = None, contains: str | None = None
-    ) -> ConditionDict: ...
+    ) -> SingleCondition: ...
 
 
-class ConditionAggregates(Protocol):
-    def __call__(
-        self,
-        type: Literal["any_of"] | Literal["all_of"],
-        conditions: int | list[ConditionDict] = 1,
-    ): ...
-    def all_of(self, conditions: int | list[ConditionDict] = 1): ...
-    def any_of(self, conditions: int | list[ConditionDict] = 1): ...
+class MutationFactories(Protocol):
+    def remove(self, xpath: str | None = None) -> MutationDict: ...
 
-
-class MutationRemoveFactory(Protocol):
-    def __call__(self, xpath: str | None = None) -> MutationDict: ...
-
-
-class MutationReplaceFactory(Protocol):
-    def __call__(
+    def replace(
         self,
         xpath: str | None = None,
         pattern: str | None = None,

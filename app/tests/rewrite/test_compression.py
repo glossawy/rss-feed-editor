@@ -4,14 +4,14 @@ from feed_editor.rewrite.rules import mutations, conditions
 from tests.support.fixture_types import (
     FeedRulesFactory,
     RuleFactory,
-    ConditionAggregates,
+    ConditionFactories,
 )
 
 
 def test_compression__identity(
     feed_rules_factory: FeedRulesFactory,
     rule_factory: RuleFactory,
-    aggregate_conditions: ConditionAggregates,
+    condition_factories: ConditionFactories,
 ):
     """
     This test runs all defined mutations and conditions through compression/decompression to
@@ -23,11 +23,11 @@ def test_compression__identity(
     ]
     conds = [
         *conds,
-        aggregate_conditions.all_of(conds),
-        aggregate_conditions.any_of(conds),
+        condition_factories.all_of(conds),
+        condition_factories.any_of(conds),
     ]
 
-    condition = aggregate_conditions.all_of(conds)
+    condition = condition_factories.all_of(conds)
 
     muts = [mutation["test_factory"]("xpath") for mutation in mutations.mutation_list]
 
