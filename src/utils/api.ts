@@ -67,7 +67,9 @@ export async function encodeRules(rules: FeedTransform) {
   else throw new Error(`Failed to encode rules: ${response.status}`)
 }
 
-export async function decodeRules(encodedRules: string) {
+export async function decodeRules(
+  encodedRules: string
+): Promise<FeedTransform> {
   const response = await fetch(apiUrl("/rewrite/rules", { r: encodedRules }))
 
   if (response.ok) return await response.json()
@@ -76,6 +78,17 @@ export async function decodeRules(encodedRules: string) {
 
 export function toRewriteUrl(encodedRules: string) {
   return apiUrl("/rewrite", { r: encodedRules })
+}
+
+export function extractFromRewriteUrl(rewriteUrl: string) {
+  const requiredPrefix = toRewriteUrl("")
+  const extractionPattern = /\/rewrite\/?\?r=(?<encoded>.+?)$/
+
+  if (rewriteUrl.startsWith(requiredPrefix)) {
+    const results = extractionPattern.exec(rewriteUrl)
+
+    if (results) return results.groups!["encoded"]
+  }
 }
 
 export async function getTransformedFeed(encodedRules: string) {
@@ -92,7 +105,7 @@ export function useEncodedRules() {
   const rules = rulesWithIds.map((r) => r.rule)
 
   const { data } = useQuery({
-    queryKey: ["encodedRules", feedUrl, rules],
+    queryKey: ["encodedRules", feedUrl, rulesWithIds],
     queryFn: () => encodeRules({ feed_url: feedUrl, rules: rules }),
     // Extremely unlikely to change so keep data for 10 minutes
     staleTime: 10 * 60 * 1000,

@@ -5,6 +5,7 @@ import { Rule } from "@app/utils/rules"
 
 export type FeedAction =
   | { type: "setUrl"; feedUrl: string }
+  | { type: "set"; feedUrl: string; rules: Rule[] }
   | { type: "add"; rule: Rule }
   | { type: "delete"; ruleId: number }
   | { type: "rawReplace"; ruleId: number; rule: RuleWithMetadata }

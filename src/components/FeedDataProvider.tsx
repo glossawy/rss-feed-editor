@@ -91,5 +91,10 @@ function feedDataReducer(feedData: FeedData, action: FeedAction): FeedData {
       }
     case "clear":
       return { feedUrl: feedData.feedUrl, rules: initialFeedData.rules }
+    case "set":
+      return {
+        feedUrl: action.feedUrl,
+        rules: action.rules.map(giveMetadata),
+      }
   }
 }
