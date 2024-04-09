@@ -21,7 +21,7 @@ def get():
     feed_rewriter = FeedRewriter(_parse_args(request.args))
 
     if not feed_rewriter.is_valid_feed:
-        return "Feed URL must be a valid url", 400
+        raise BadRequest("Feed URL must be a valid url")
 
     current_app.logger.info(f"Rewrote feed for {feed_rewriter.feed_url}")
 
@@ -30,6 +30,12 @@ def get():
         200,
         {"Content-Type": feed_rewriter.mime_type},
     )
+
+
+@rewrite_api.route("/rules", methods=["GET"])
+def rules():
+    """Takes encoded feed rules and returns the encoded json blob"""
+    return _parse_args(request.args)
 
 
 @rewrite_api.route("/url", methods=["POST"])
