@@ -54,27 +54,48 @@ export function apiUrl(endpoint: string, queryParams?: Record<string, string>) {
   else return url
 }
 
-function textFromResponse(response: Response) {
-  if (response.ok) return response.text()
-  else throw new Error("Failed to fetch")
-}
-
-export function encodeRules(rules: FeedTransform) {
-  return fetch(apiUrl("/rewrite/url"), {
+export async function encodeRules(rules: FeedTransform) {
+  const response = await fetch(apiUrl("/rewrite/url"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(rules),
-  }).then(textFromResponse)
+  })
+
+  if (response.ok) return await response.text()
+  else throw new Error(`Failed to encode rules: ${response.status}`)
+}
+
+export async function decodeRules(
+  encodedRules: string
+): Promise<FeedTransform> {
+  const response = await fetch(apiUrl("/rewrite/rules", { r: encodedRules }))
+
+  if (response.ok) return await response.json()
+  else throw new Error(`Failed to decode rules: ${response.status}`)
 }
 
 export function toRewriteUrl(encodedRules: string) {
   return apiUrl("/rewrite", { r: encodedRules })
 }
 
-export function getTransformedFeed(encodedRules: string) {
-  return fetch(toRewriteUrl(encodedRules)).then(textFromResponse)
+export function extractFromRewriteUrl(rewriteUrl: string) {
+  const requiredPrefix = toRewriteUrl("")
+  const extractionPattern = /\/rewrite\/?\?r=(?<encoded>.+?)$/
+
+  if (rewriteUrl.startsWith(requiredPrefix)) {
+    const results = extractionPattern.exec(rewriteUrl)
+
+    if (results) return results.groups!["encoded"]
+  }
+}
+
+export async function getTransformedFeed(encodedRules: string) {
+  const response = await fetch(toRewriteUrl(encodedRules))
+
+  if (response.ok) return await response.text()
+  else throw new Error(`Failed to fetch transformed feed: ${response.status}`)
 }
 
 export function useEncodedRules() {
@@ -84,7 +105,7 @@ export function useEncodedRules() {
   const rules = rulesWithIds.map((r) => r.rule)
 
   const { data } = useQuery({
-    queryKey: ["encodedRules", feedUrl, rules],
+    queryKey: ["encodedRules", feedUrl, rulesWithIds],
     queryFn: () => encodeRules({ feed_url: feedUrl, rules: rules }),
     // Extremely unlikely to change so keep data for 10 minutes
     staleTime: 10 * 60 * 1000,

@@ -3,11 +3,13 @@ import { CssBaseline, CssVarsProvider, Grid, Stack, Typography } from "@mui/joy"
 import DarkModeToggle from "@app/components/DarkModeToggle"
 import { FeedDataProvider } from "@app/components/FeedDataProvider"
 import FeedDataResetButton from "@app/components/FeedDataResetButton"
-import FeedPreviewLink from "@app/components/FeedPreviewLink"
 import FeedUrlForm from "@app/components/FeedUrlForm"
 import RulesEditor from "@app/components/RulesEditor"
+import TransformedFeedUrl from "@app/components/TransformedFeedUrl"
 import useLocalStorage from "@app/hooks/localStorage"
 import { LocalStorageKeys } from "@app/utils/defaults"
+
+import FeedDataImportButton from "./components/FeedDataImportButton"
 
 function App() {
   const [colorMode] = useLocalStorage(LocalStorageKeys.colorMode, "light")
@@ -30,12 +32,13 @@ function App() {
               <Stack direction="row-reverse">
                 <DarkModeToggle />
                 <FeedDataResetButton />
+                <FeedDataImportButton />
               </Stack>
             </Grid>
           </Grid>
           <Stack id="rss-outputs" spacing={0}>
             <Typography level="title-sm">Transformed Feed URL</Typography>
-            <FeedPreviewLink />
+            <TransformedFeedUrl />
           </Stack>
           <RulesEditor />
         </Stack>

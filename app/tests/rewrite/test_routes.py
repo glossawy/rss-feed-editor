@@ -132,6 +132,27 @@ def test_get__complex_rules(
     assert any("ROSCOM" in title for title in response_titles if title is not None)
 
 
+def test_rules__valid(client: FlaskClient, rss_rules: FeedRulesDict):
+    encoded = compress_and_encode(rss_rules)
+
+    response = client.get("/rewrite/rules", query_string={"r": encoded})
+
+    assert response.status_code == 200
+    assert response.json == rss_rules
+
+
+def test_rules__no_encoded_value(client: FlaskClient):
+    response = client.get("/rewrite/rules")
+    assert response.status_code == 400
+
+
+def test_rules__invalid_encoded_value(client: FlaskClient):
+    response = client.get(
+        "/rewrite/rules", query_string={"r": _gzip_encode({"invalid": "data"})}
+    )
+    assert response.status_code == 400
+
+
 @pytest.mark.parametrize("excluded_field", ["feed_url", "rules"])
 def test_url__missing_required_fields(client: FlaskClient, excluded_field):
     data = {"feed_url": "https://example.fake", "rules": []}

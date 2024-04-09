@@ -55,7 +55,7 @@ export default function EditorSidebar({
         onMoveUp={onMoveUp}
         onMoveDown={onMoveDown}
         onDelete={onDelete}
-        sx={{ height: "100%", overflow: "scroll" }}
+        sx={{ height: "100%", overflow: "auto" }}
         reorderable
         deletable
         addable

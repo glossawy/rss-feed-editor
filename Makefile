@@ -18,7 +18,10 @@ build-image-backend: lint-backend
 
 build-images: build-image-frontend build-image-backend
 
+build: build-frontend
+
 start: build
+	docker compose build
 	docker compose up
 
 dev-frontend:
