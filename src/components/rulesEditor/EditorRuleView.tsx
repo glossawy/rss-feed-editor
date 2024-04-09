@@ -70,7 +70,7 @@ function RuleView({
   )
 
   return (
-    <Box sx={{ maxHeight: "100%", overflow: "scroll" }}>
+    <Box sx={{ maxHeight: "100%", overflow: "auto" }}>
       <FormControl sx={{ padding: 1 }}>
         <FormLabel>Target XPath</FormLabel>
         <Input value={rule.xpath} onChange={handleXPathChange} />
