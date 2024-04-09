@@ -1,0 +1,66 @@
+{
+  "feed_url": "https://example.fake",
+  "rules": [
+    {
+      "xpath": "//channel/item",
+      "condition": {
+        "any_of": [
+          {
+            "xpath": "title",
+            "name": "contains",
+            "args": {
+              "value": "NASA"
+            }
+          }
+        ]
+      },
+      "mutations": [
+        {
+          "xpath": "title",
+          "name": "replace",
+          "args": {
+            "pattern": "NASA",
+            "replacement": "ROSCOM",
+            "trim": false
+          }
+        },
+        {
+          "xpath": "description",
+          "name": "replace",
+          "args": {
+            "pattern": "NASA",
+            "replacement": "ROSCOM",
+            "trim": false
+          }
+        }
+      ]
+    },
+    {
+      "xpath": "//channel/item",
+      "condition": {
+        "all_of": [
+          {
+            "xpath": "title",
+            "name": "contains",
+            "args": {
+              "value": "Astronaut"
+            }
+          },
+          {
+            "xpath": "title",
+            "name": "contains",
+            "args": {
+              "value": "Space Station"
+            }
+          }
+        ]
+      },
+      "mutations": [
+        {
+          "name": "remove",
+          "args": {}
+        }
+      ]
+    }
+  ]
+}

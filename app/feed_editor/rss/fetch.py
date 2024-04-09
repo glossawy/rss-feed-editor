@@ -1,9 +1,14 @@
 import httpx
 import validators  # type: ignore
 from lxml import etree
+from lxml.etree import _Element as Element
 
 from feed_editor.rss.errors import FeedError
 from feed_editor.rss.models import Feed
+
+
+def _to_etree(feed_text: str) -> Element:
+    return etree.fromstring(feed_text.encode("utf-8"), parser=etree.XMLParser())
 
 
 def fetch_feed(rss_feed_url: str) -> Feed:
@@ -33,8 +38,7 @@ def fetch_feed(rss_feed_url: str) -> Feed:
         )
 
     try:
-        parser = etree.XMLParser()
-        root = etree.fromstring(resp.text.encode("utf-8"), parser)
+        root = _to_etree(resp.text)
         return Feed.from_root(root)
     except etree.XMLSyntaxError as exc:
         raise FeedError(

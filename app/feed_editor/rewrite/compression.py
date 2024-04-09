@@ -53,12 +53,7 @@ def compress_and_encode(rules: FeedRulesDict) -> str:
     Takes a feed url and its transforms, minifies the dict, compresses it
     and urlsafe b64 encodes it
     """
-    simplified = _simplify_feed_dict(rules)
-    jsonified = _json_dumps(simplified)
-    gzipped = gzip.compress(jsonified.encode("utf-8"))
-    encoded = base64.urlsafe_b64encode(gzipped).decode("utf-8")
-
-    return encoded
+    return _gzip_encode(_simplify_feed_dict(rules))
 
 
 def decode_and_decompress(encoded: str) -> FeedRulesDict:
@@ -69,11 +64,22 @@ def decode_and_decompress(encoded: str) -> FeedRulesDict:
     A lot of assumptions are made in this process, there is a last step of TypedDict
     validation that should fail if any of the assumptions were wrong.
     """
-    decoded = base64.urlsafe_b64decode(encoded.encode("utf-8"))
-    unzipped = gzip.decompress(decoded).decode("utf-8")
-    simplified = json.loads(unzipped)
+    return _feedify_simple_dict(_decode_ungzip(encoded))
 
-    return _feedify_simple_dict(simplified)
+
+def _gzip_encode(data: dict) -> str:
+    jsonified = _json_dumps(data)
+    gzipped = gzip.compress(jsonified.encode("utf-8"))
+    encoded = base64.urlsafe_b64encode(gzipped).decode("utf-8")
+
+    return encoded
+
+
+def _decode_ungzip(data: str) -> dict:
+    decoded = base64.urlsafe_b64decode(data.encode("utf-8"))
+    unzipped = gzip.decompress(decoded).decode("utf-8")
+
+    return json.loads(unzipped)
 
 
 def _json_dumps(data: Mapping) -> str:
@@ -186,6 +192,12 @@ def _feedify_simple_dict(simple_dict: dict) -> FeedRulesDict:
                 for mut in simple_rule[KEY_MINIFY_MAP["mutations"]]
             ],
         }
+
+    if (
+        KEY_MINIFY_MAP["feed_url"] not in simple_dict
+        or KEY_MINIFY_MAP["rules"] not in simple_dict
+    ):
+        return validate_dict(FeedRulesDict, simple_dict)
 
     return validate_dict(
         FeedRulesDict,

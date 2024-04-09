@@ -1,15 +1,54 @@
 # pylint: disable=redefined-outer-name,protected-access
 
+import json
 from pathlib import Path
 from typing import cast
 
+from feed_editor import create_app
+from flask.testing import FlaskCliRunner, FlaskClient
 import pytest
 from feed_editor.rss.models import Feed
 from lxml import etree
+from flask import Flask
 
-from tests.support.fixture_types import FeedFactory, FeedTreeFactory, FeedXmlLoader
+from tests.support.fixture_types import (
+    FeedFactory,
+    FeedTreeFactory,
+    FeedXmlLoader,
+    JsonLoader,
+)
 
 FIXTURES_PATH = Path(__file__).joinpath("..", "fixtures").resolve()
+
+
+@pytest.fixture
+def app() -> Flask:
+    app = create_app()
+    app.config.update({"TESTING": True})
+
+    return app
+
+
+@pytest.fixture
+def client(app: Flask) -> FlaskClient:
+    return app.test_client()
+
+
+@pytest.fixture
+def runner(app: Flask) -> FlaskCliRunner:
+    return app.test_cli_runner()
+
+
+@pytest.fixture
+def json_loader() -> JsonLoader:
+    def loader(fixture_name: str):
+        if not fixture_name.endswith(".json"):
+            name = f"{fixture_name}.json"
+
+        with open(FIXTURES_PATH.joinpath(name), "r", encoding="utf-8") as jsonfile:
+            return json.loads(jsonfile.read())
+
+    return loader
 
 
 @pytest.fixture

@@ -1,4 +1,4 @@
-from typing import Callable, Protocol
+from typing import Any, Callable, Protocol
 
 from feed_editor.rewrite.rules.types import (
     AndDict,
@@ -15,6 +15,10 @@ from lxml.etree import _ElementTree as ElementTree
 
 MutationFactory = Callable[..., MutationDict]
 ConditionFactory = Callable[..., ConditionDict]
+
+
+class JsonLoader(Protocol):
+    def __call__(self, fixture_name: str) -> dict[str, Any]: ...
 
 
 class FeedXmlLoader(Protocol):
