@@ -8,7 +8,7 @@ readme = "README.md"
 packages = [{ include = 'feed_editor', from = 'app' }]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 Flask = "^2.3.3"
 flask-cors = "^4.0.0"
 lxml = "^4.9.3"
@@ -18,9 +18,27 @@ pydantic = "^2.3.0"
 
 
 [tool.poetry.group.dev.dependencies]
-pylint = "^2.17.5"
+pylint = "^3.1.0"
 lxml-stubs = "^0.5.1"
 flake8 = "^7.0.0"
+pytest = "^8.1.1"
+isort = "^5.13.2"
+types-flask-cors = "^4.0.0.20240106"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["app/tests"]
+norecursedirs = ["app/tests/support"]
+pythonpath = ["app/tests/support"]
+
+[tool.mypy]
+check_untyped_defs = true
+
+[tool.isort]
+known_firstparty = ["feed_editor"]
+multi_line_output = 3
+include_trailing_comma = true
+use_parentheses = true
 
 [build-system]
 requires = ["poetry-core"]

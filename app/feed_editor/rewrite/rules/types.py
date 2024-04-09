@@ -1,15 +1,15 @@
 # flake8: noqa
 # pylint: skip-file
 
-from typing_extensions import TypedDict
+from typing import TypedDict
 
-from .conditions import ConditionArgs
-from .mutations import MutationArgs
+from feed_editor.rewrite.rules.conditions import ConditionArgs
+from feed_editor.rewrite.rules.mutations import MutationArgs
 
 
 class SingleConditionWithoutXPath(TypedDict):
     name: str
-    args: ConditionArgs
+    args: "ConditionArgs"
 
 
 class SingleConditionWithXPath(SingleConditionWithoutXPath):
@@ -32,7 +32,7 @@ ConditionDict = AndDict | OrDict | SingleCondition
 
 class MutationDictWithoutXPath(TypedDict):
     name: str
-    args: MutationArgs
+    args: "MutationArgs"
 
 
 class MutationDictWithXPath(MutationDictWithoutXPath):

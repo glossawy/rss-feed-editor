@@ -3,6 +3,7 @@ lint-frontend:
 	bun lint --fix
 
 lint-backend:
+	poetry run isort ./app
 	poetry run pylint ./app
 	poetry run flake8 ./app
 

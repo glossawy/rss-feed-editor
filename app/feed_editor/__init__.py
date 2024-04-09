@@ -1,11 +1,10 @@
 import os
 
-from flask import Flask, Blueprint
+from flask import Blueprint, Flask
 from flask_cors import CORS
-
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from feed_editor import rewrite, health_check
+from feed_editor import health_check, rewrite
 
 
 def create_app() -> Flask:  # pylint: disable=missing-function-docstring

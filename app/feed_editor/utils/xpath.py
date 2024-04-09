@@ -1,8 +1,7 @@
 import functools
-from typing import Concatenate, Callable, TypeVar, ParamSpec, Mapping, cast
+from typing import Callable, Concatenate, Mapping, ParamSpec, TypeVar, cast
 
 from lxml import etree
-
 
 _P = ParamSpec("_P")
 _Result_T = TypeVar("_Result_T")  # pylint: disable=invalid-name
@@ -32,8 +31,7 @@ def _normalize_tree_input(
     return unaware
 
 
-@_normalize_tree_input
-def ns_aware_find(
+def _ns_aware_find(
     root: _ElementOrTree, nsmap: _NamespaceMap, xpath: str
 ) -> etree._Element | None:
     """
@@ -49,8 +47,7 @@ def ns_aware_find(
     return root.find(xpath, namespaces=nsmap)
 
 
-@_normalize_tree_input
-def ns_aware_findall(
+def _ns_aware_findall(
     root: _ElementOrTree, nsmap: _NamespaceMap, xpath: str
 ) -> list[etree._Element]:
     """
@@ -65,3 +62,7 @@ def ns_aware_findall(
         list[etree._Element]: All found nodes for the given xpath
     """
     return root.findall(xpath, namespaces=nsmap)
+
+
+ns_aware_find = _normalize_tree_input(_ns_aware_find)
+ns_aware_findall = _normalize_tree_input(_ns_aware_findall)
