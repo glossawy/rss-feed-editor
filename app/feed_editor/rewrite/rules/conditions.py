@@ -1,5 +1,6 @@
+# pylint: disable=too-few-public-methods,missing-class-docstring
 import functools
-from typing import Protocol, Callable, TypedDict, TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, Protocol, TypedDict
 
 from feed_editor.utils.dict_validation import _TypedDict_T, validate_dict
 

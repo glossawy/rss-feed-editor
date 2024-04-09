@@ -1,22 +1,22 @@
-# pylint: disable=redefined-outer-name,protected-access
+# pylint: disable=redefined-outer-name,protected-access,missing-function-docstring
 
 import json
 from pathlib import Path
 from typing import cast
 
-from feed_editor import create_app
-from flask.testing import FlaskCliRunner, FlaskClient
 import pytest
-from feed_editor.rss.models import Feed
-from lxml import etree
 from flask import Flask
-
+from flask.testing import FlaskClient, FlaskCliRunner
+from lxml import etree
 from tests.support.fixture_types import (
     FeedFactory,
     FeedTreeFactory,
     FeedXmlLoader,
     JsonLoader,
 )
+
+from feed_editor import create_app
+from feed_editor.rss.models import Feed
 
 FIXTURES_PATH = Path(__file__).joinpath("..", "fixtures").resolve()
 
@@ -43,9 +43,11 @@ def runner(app: Flask) -> FlaskCliRunner:
 def json_loader() -> JsonLoader:
     def loader(fixture_name: str):
         if not fixture_name.endswith(".json"):
-            name = f"{fixture_name}.json"
+            fixture_name = f"{fixture_name}.json"
 
-        with open(FIXTURES_PATH.joinpath(name), "r", encoding="utf-8") as jsonfile:
+        with open(
+            FIXTURES_PATH.joinpath(fixture_name), "r", encoding="utf-8"
+        ) as jsonfile:
             return json.loads(jsonfile.read())
 
     return loader
@@ -55,9 +57,11 @@ def json_loader() -> JsonLoader:
 def feed_xml_loader() -> FeedXmlLoader:
     def loader(feed_fixture_name: str):
         if not feed_fixture_name.endswith(".xml"):
-            name = f"{feed_fixture_name}.xml"
+            feed_fixture_name = f"{feed_fixture_name}.xml"
 
-        with open(FIXTURES_PATH.joinpath(name), "r", encoding="utf-8") as feed:
+        with open(
+            FIXTURES_PATH.joinpath(feed_fixture_name), "r", encoding="utf-8"
+        ) as feed:
             return feed.read()
 
     return loader

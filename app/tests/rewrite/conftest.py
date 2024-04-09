@@ -1,5 +1,15 @@
+# pylint: disable=redefined-outer-name,protected-access,missing-function-docstring
 import random
 from typing import Literal, cast
+
+import pytest
+from tests.support.fixture_types import (
+    ConditionFactories,
+    FeedRulesFactory,
+    MutationFactories,
+    RuleFactory,
+)
+
 from feed_editor.rewrite.rules.types import (
     AndDict,
     ConditionDict,
@@ -7,27 +17,20 @@ from feed_editor.rewrite.rules.types import (
     MutationDict,
     OrDict,
     RuleDict,
-)
-import pytest
-
-from tests.support.fixture_types import (
-    ConditionFactories,
-    MutationFactories,
-    FeedRulesFactory,
-    RuleFactory,
+    SingleCondition,
 )
 
 
 class _ConditionFactories(ConditionFactories):
     def _aggregate_condition(
         self,
-        type: Literal["all_of"] | Literal["any_of"],
+        aggregate_type: Literal["all_of"] | Literal["any_of"],
         conditions: int | list[ConditionDict] = 1,
     ) -> AndDict | OrDict:
         if isinstance(conditions, int):
             conditions = [self._contains_factory() for _ in range(conditions)]
 
-        if type == "all_of":
+        if aggregate_type == "all_of":
             return {"all_of": conditions}
         return {"any_of": conditions}
 
@@ -37,7 +40,7 @@ class _ConditionFactories(ConditionFactories):
     def any_of(self, conditions: int | list[ConditionDict] = 1) -> OrDict:
         return cast(OrDict, self._aggregate_condition("any_of", conditions))
 
-    def _contains_factory(self, xpath=None, contains=None) -> ConditionDict:
+    def _contains_factory(self, xpath=None, contains=None) -> SingleCondition:
         return {
             "xpath": xpath or "webMaster",
             "name": "contains",
@@ -46,7 +49,7 @@ class _ConditionFactories(ConditionFactories):
 
     def contains(
         self, xpath: str | None = None, contains: str | None = None
-    ) -> ConditionDict:
+    ) -> SingleCondition:
         return self._contains_factory(xpath, contains)
 
 

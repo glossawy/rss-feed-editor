@@ -1,8 +1,7 @@
 import functools
-from typing import Concatenate, Callable, TypeVar, ParamSpec, Mapping, cast
+from typing import Callable, Concatenate, Mapping, ParamSpec, TypeVar, cast
 
 from lxml import etree
-
 
 _P = ParamSpec("_P")
 _Result_T = TypeVar("_Result_T")  # pylint: disable=invalid-name

@@ -1,7 +1,9 @@
-import pytest
-from feed_editor.rss.models import Feed, FeedType
+# pylint: disable=missing-function-docstring
 
-from tests.support.fixture_types import FeedTreeFactory, FeedFactory
+import pytest
+from tests.support.fixture_types import FeedFactory, FeedTreeFactory
+
+from feed_editor.rss.models import Feed, FeedType
 
 
 @pytest.mark.parametrize(

@@ -1,7 +1,9 @@
+# pylint: disable=missing-function-docstring
 from typing import Callable
-from feed_editor.utils.xpath import ns_aware_find, ns_aware_findall
 
 from lxml.etree import _ElementTree as ElementTree
+
+from feed_editor.utils.xpath import ns_aware_find, ns_aware_findall
 
 
 def test_ns_aware_find(feed_tree_factory: Callable[[str], ElementTree]):

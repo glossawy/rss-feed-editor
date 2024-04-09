@@ -2,10 +2,11 @@ import dataclasses
 from functools import cached_property
 from typing import cast
 
-from feed_editor.rss.errors import FeedError
 import validators  # type: ignore
+
 from feed_editor.rewrite.rules import run_rule
 from feed_editor.rewrite.rules.types import FeedRulesDict
+from feed_editor.rss.errors import FeedError
 from feed_editor.rss.fetch import Feed
 from feed_editor.rss.fetch import fetch_feed as rss_fetch
 from feed_editor.rss.models import FeedType

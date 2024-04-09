@@ -1,10 +1,12 @@
+# pylint: disable=too-few-public-methods,missing-class-docstring
+
 import functools
 import re
-
-from typing import Protocol, Callable, TypedDict, TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, Protocol, TypedDict
 
 from lxml import etree
-from feed_editor.utils.dict_validation import validate_dict, _TypedDict_T
+
+from feed_editor.utils.dict_validation import _TypedDict_T, validate_dict
 
 if TYPE_CHECKING:
     from .types import MutationDict

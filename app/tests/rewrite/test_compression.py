@@ -1,11 +1,11 @@
-from feed_editor.rewrite import compression
-
-from feed_editor.rewrite.rules import mutations, conditions
 from tests.support.fixture_types import (
+    ConditionFactories,
     FeedRulesFactory,
     RuleFactory,
-    ConditionFactories,
 )
+
+from feed_editor.rewrite import compression
+from feed_editor.rewrite.rules import conditions, mutations
 
 
 def test_compression__identity(

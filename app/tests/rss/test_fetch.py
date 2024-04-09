@@ -1,17 +1,15 @@
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,missing-class-docstring,missing-function-docstring,too-few-public-methods
 
 from typing import Protocol
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from feed_editor.rss.models import FeedType
 import httpx
 import pytest
-
 from lxml import etree
+from tests.support.fixture_types import FeedFactory
 
 from feed_editor.rss.fetch import FeedError, fetch_feed
-
-from tests.support.fixture_types import FeedFactory
+from feed_editor.rss.models import FeedType
 
 
 class ResponseFactory(Protocol):

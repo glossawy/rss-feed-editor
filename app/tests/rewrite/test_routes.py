@@ -1,19 +1,21 @@
+# pylint: disable=missing-function-docstring,redefined-outer-name
+
 from typing import cast
-from feed_editor.rewrite.rules.types import FeedRulesDict
-from flask.testing import FlaskClient
+from unittest.mock import MagicMock, patch
 
-from feed_editor.rewrite.compression import compress_and_encode, _gzip_encode
-from feed_editor.rss.fetch import _to_etree
 import pytest
-from unittest.mock import patch, MagicMock
-
+from flask.testing import FlaskClient
 from tests.support.fixture_types import (
-    FeedRulesFactory,
-    FeedFactory,
-    JsonLoader,
     ConditionFactories,
+    FeedFactory,
+    FeedRulesFactory,
+    JsonLoader,
     MutationFactories,
 )
+
+from feed_editor.rewrite.compression import _gzip_encode, compress_and_encode
+from feed_editor.rewrite.rules.types import FeedRulesDict
+from feed_editor.rss.fetch import _to_etree
 
 
 @pytest.fixture

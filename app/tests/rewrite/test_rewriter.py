@@ -1,15 +1,18 @@
-from unittest.mock import create_autospec, patch, call, MagicMock, sentinel
+# pylint: disable=missing-function-docstring
+
+from unittest.mock import MagicMock, call, create_autospec, patch, sentinel
+
+import pytest
+from tests.support.fixture_types import (
+    ConditionFactories,
+    FeedFactory,
+    FeedRulesFactory,
+    RuleFactory,
+)
 
 from feed_editor.rewrite.rewriter import FeedRewriter
 from feed_editor.rss.errors import FeedError
 from feed_editor.rss.models import Feed
-import pytest
-from tests.support.fixture_types import (
-    FeedRulesFactory,
-    RuleFactory,
-    ConditionFactories,
-    FeedFactory,
-)
 
 
 def test_feed_rewriter__is_valid_feed__valid(feed_rules_factory: FeedRulesFactory):
@@ -122,4 +125,4 @@ def test_feed_rewriter__mime_type__unknown_feed_type(
     rss_fetch.return_value = mock_feed
 
     with pytest.raises(FeedError, match=r"mime type known.+?mysterious-feed"):
-        rewriter.mime_type
+        rewriter.mime_type  # pylint: disable=pointless-statement

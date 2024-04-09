@@ -1,10 +1,13 @@
 from typing import Mapping
-from flask import current_app, Blueprint, request
 
 import pydantic
+from flask import Blueprint, current_app, request
 from werkzeug.exceptions import BadRequest
 
-from feed_editor.rewrite.compression import compress_and_encode, decode_and_decompress
+from feed_editor.rewrite.compression import (
+    compress_and_encode,
+    decode_and_decompress,
+)
 from feed_editor.rewrite.rewriter import FeedRewriter
 from feed_editor.rewrite.rules import validate_dict, validate_xpaths
 from feed_editor.rewrite.rules.types import FeedRulesDict
@@ -46,8 +49,8 @@ def url():
 
     try:
         feed_dict = validate_dict(request_json)
-    except pydantic.ValidationError:
-        raise BadRequest("Invalid rules.")
+    except pydantic.ValidationError as exc:
+        raise BadRequest("Invalid rules.") from exc
 
     if not validate_xpaths(feed_dict):
         raise BadRequest("Invalid xpaths.")
@@ -61,7 +64,7 @@ def _parse_args(params: Mapping[str, str]) -> FeedRulesDict:
     if feed_data_gzipped:
         try:
             return decode_and_decompress(feed_data_gzipped)
-        except pydantic.ValidationError:
-            raise BadRequest("Invalid encoded rules.")
+        except pydantic.ValidationError as exc:
+            raise BadRequest("Invalid encoded rules.") from exc
 
     raise BadRequest()

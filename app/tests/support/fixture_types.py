@@ -1,4 +1,7 @@
+# pylint: disable=missing-function-docstring,missing-class-docstring,too-few-public-methods
 from typing import Any, Callable, Protocol
+
+from lxml.etree import _ElementTree as ElementTree
 
 from feed_editor.rewrite.rules.types import (
     AndDict,
@@ -10,8 +13,6 @@ from feed_editor.rewrite.rules.types import (
     SingleCondition,
 )
 from feed_editor.rss.models import Feed
-from lxml.etree import _ElementTree as ElementTree
-
 
 MutationFactory = Callable[..., MutationDict]
 ConditionFactory = Callable[..., ConditionDict]

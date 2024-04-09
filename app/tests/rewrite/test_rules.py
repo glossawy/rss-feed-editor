@@ -1,25 +1,30 @@
+# pylint: disable=missing-function-docstring,redefined-outer-name
+
 from typing import cast
-from feed_editor.rewrite.rules import (
-    validate_dict,
-    validate_xpaths,
-    test_conditions_element as match_conditions_element,
-    run_mutations_element,
-    run_rule,
-    apply_rule,
+
+import pydantic
+import pytest
+from lxml.etree import _Element as Element
+from lxml.etree import _ElementTree as ElementTree
+from tests.support.fixture_types import (
+    ConditionFactories,
+    FeedRulesFactory,
+    MutationFactories,
 )
 
+from feed_editor.rewrite.rules import (
+    apply_rule,
+    run_mutations_element,
+    run_rule,
+)
+from feed_editor.rewrite.rules import (
+    test_conditions_element as match_conditions_element,
+)
+from feed_editor.rewrite.rules import validate_dict, validate_xpaths
 from feed_editor.rewrite.rules.types import (
     MutationDictWithoutXPath,
     RuleDict,
     SingleConditionWithoutXPath,
-)
-import pydantic
-import pytest
-from lxml.etree import _Element as Element, _ElementTree as ElementTree
-from tests.support.fixture_types import (
-    FeedRulesFactory,
-    ConditionFactories,
-    MutationFactories,
 )
 
 
@@ -36,7 +41,7 @@ def rss_item(rss_tree: ElementTree) -> Element:
     return element
 
 
-def test_validate_dict__invalid_dict(feed_rules_factory: FeedRulesFactory):
+def test_validate_dict__invalid_dict():
     with pytest.raises(pydantic.ValidationError):
         validate_dict({"not": "correct"})
 

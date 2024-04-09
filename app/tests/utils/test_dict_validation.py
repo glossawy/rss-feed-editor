@@ -1,9 +1,10 @@
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,missing-function-docstring,missing-class-docstring
 
 from typing import Mapping, NotRequired, TypedDict
 
 import pydantic
 import pytest
+
 from feed_editor.utils.dict_validation import dict_validator, validate_dict
 
 
@@ -44,7 +45,7 @@ def test_validate_dict(test_typed_dict_class, test_dict: Mapping):
 def test_dict_validator(test_typed_dict_class, test_dict: Mapping, is_valid):
     validator = dict_validator(test_typed_dict_class)
 
-    assert type(validator) is pydantic.TypeAdapter
+    assert isinstance(validator, pydantic.TypeAdapter)
 
     try:
         validator.validate_python(test_dict)

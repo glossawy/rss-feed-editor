@@ -2,18 +2,19 @@ import base64
 import gzip
 import json
 from typing import Mapping, Union, cast
-from feed_editor.utils.dict_validation import validate_dict
+
 from feed_editor.rewrite.rules.conditions import ConditionArgs
 from feed_editor.rewrite.rules.mutations import MutationArgs
 from feed_editor.rewrite.rules.types import (
-    FeedRulesDict,
     ConditionDict,
+    FeedRulesDict,
     MutationDict,
     MutationDictWithoutXPath,
     RuleDict,
     SingleCondition,
     SingleConditionWithoutXPath,
 )
+from feed_editor.utils.dict_validation import validate_dict
 
 # Each key in the feed dict must have a unique mapping here
 # otherwise it wont be minified. If there is a collision then

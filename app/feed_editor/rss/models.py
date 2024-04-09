@@ -1,7 +1,6 @@
-from dataclasses import dataclass
-
 import copy
 import enum
+from dataclasses import dataclass
 
 from lxml import etree
 
@@ -24,6 +23,9 @@ class Feed:
 
     @classmethod
     def from_root(cls, root: etree._Element) -> "Feed":
+        """Returns a Feed with a type derived from the given root element,
+        this is primarily based on tag name
+        """
         tag_name = root.tag.lower()
 
         if tag_name.endswith("rss"):

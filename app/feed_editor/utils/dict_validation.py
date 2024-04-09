@@ -2,7 +2,6 @@ from typing import Mapping, TypeVar
 
 from pydantic.type_adapter import TypeAdapter
 
-
 _TypedDict_T = TypeVar("_TypedDict_T", bound=Mapping)  # pylint: disable=invalid-name
 
 
