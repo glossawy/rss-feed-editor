@@ -16,9 +16,9 @@ export default function useClipboard() {
   })
 
   const writeToClipboard = useCallback(
-    (value: string) => {
+    async (value: string) => {
       if (writeAllowed) {
-        writeText(value)
+        await writeText(value)
       }
     },
     [writeAllowed]
