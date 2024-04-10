@@ -10,7 +10,7 @@ lint-backend:
 build-frontend: lint-frontend
 	bun run build
 
-build-image-frontend: build-frontend
+build-image-frontend: lint-frontend
 	docker buildx build --platform linux/arm64,linux/amd64 -t glossawy/rss-feed-editor-frontend:latest -f Dockerfile.frontend . --load
 
 build-image-backend: lint-backend
@@ -20,7 +20,7 @@ build-images: build-image-frontend build-image-backend
 
 build: build-frontend
 
-start: build
+start:
 	docker compose build
 	docker compose up
 

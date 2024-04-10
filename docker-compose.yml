@@ -13,7 +13,9 @@ services:
       - ./app:/app/app
 
   caddy:
-    image: caddy:latest
+    build:
+      dockerfile: Dockerfile.frontend
+      context: .
     restart: unless-stopped
     ports:
       - 3000:80
@@ -21,7 +23,6 @@ services:
       - app
     volumes:
       - ./caddyfiles/Caddyfile.dev:/etc/caddy/Caddyfile
-      - ./dist:/var/www/app/html
     networks:
       - dev
 networks:

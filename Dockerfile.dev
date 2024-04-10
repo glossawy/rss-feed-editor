@@ -1,16 +1,38 @@
-FROM python:3.12-alpine
+FROM python:3.12-alpine as base
 
-EXPOSE 5000
+ENV POETRY_NO_INTERACTION=1 \
+  POETRY_VIRTUALENVS_IN_PROJECT=1 \
+  PEOTRY_VIRTUALENVS_CREATE=0 \
+  POETRY_CACHE_DIR=/tmp/poetry-cache \
+  PATH="/app/.venv/bin:$PATH"
 
-RUN apk add --no-cache build-base libffi-dev
-RUN pip install poetry
+USER root
 
 RUN mkdir /app
 WORKDIR /app
 
+FROM base as builder
+
+RUN apk add --no-cache build-base libffi-dev
+RUN python -m venv /app/.venv
+RUN pip install poetry
+
 COPY ./pyproject.toml /app
 COPY ./poetry.lock /app
-COPY ./README.md /app
-COPY ./scripts /app/scripts
 
-CMD /app/scripts/entrypoint.sh
+RUN poetry install --without=dev --compile --no-root
+
+FROM base as development
+
+EXPOSE 5000
+
+RUN addgroup flask && \
+  adduser -H -D -G flask flask
+
+USER flask
+
+COPY --from=builder /app/pyproject.toml /app/
+COPY --from=builder /app/poetry.lock /app/
+COPY --from=builder --chown=flask:flask /app/.venv /app/.venv
+
+CMD poetry run flask -A ./app/feed_editor --debug run --host '0.0.0.0' --port 5000

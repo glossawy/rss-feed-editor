@@ -1,7 +1,31 @@
+FROM oven/bun:1.1-alpine as node-builder
+
+RUN mkdir -p /app/
+WORKDIR /app
+
+COPY ./tsconfig.json /app
+COPY ./tsconfig.node.json /app
+COPY ./package.json /app
+COPY ./vite.config.ts /app
+COPY ./src /app/src
+COPY ./index.html /app
+COPY ./bun.lockb /app
+
+RUN bun install --frozen-lockfile
+RUN bun run build
+
 FROM caddy:2-alpine
 
 EXPOSE 80
 
-RUN mkdir -p /var/www/app
-COPY ./dist /var/www/app/html
+RUN mkdir -p /var/www/app && \
+  addgroup -g 101 -S caddy && \
+  adduser -u 101 -H -D -S -G caddy caddy && \
+  # install -d -g caddy -o caddy -m 755 /var/www/app && \
+  chown -R caddy:caddy /config /data
+
+COPY --from=node-builder /app/dist /var/www/app/html
+
+USER caddy
+
 COPY ./caddyfiles/Caddyfile.prod /etc/caddy/Caddyfile
