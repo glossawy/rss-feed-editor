@@ -38,7 +38,7 @@ export const FeedDataProvider = ({ children }: PropsWithChildren<object>) => {
 
 function feedDataReducer(feedData: FeedData, action: FeedAction): FeedData {
   const ids = feedData.rules.map((r) => r.id)
-  let nextId = ids.length === 0 ? 1 : collections.max(ids) + 1
+  let nextId = ids.length === 0 ? 1 : collections.max(ids)! + 1
 
   const giveMetadata = (rule: Rule): RuleWithMetadata => ({
     name: `Rule ${nextId}`,

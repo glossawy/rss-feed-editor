@@ -1,9 +1,11 @@
+type Length<T> = Pick<T[], "length">
 type Reduce<T> = Pick<T[], "reduce">
 type Mappable<T> = Pick<T[], "map">
 type Filterable<T> = Pick<T[], "filter">
 
 export default {
-  max<T>(xs: Reduce<T>): T {
+  max<T>(xs: Reduce<T> & Length<T>): T | null {
+    if (xs.length === 0) return null
     return xs.reduce((a, e) => (e > a ? e : a))
   },
   placeAt<T>(elem: T, xs: Mappable<T>, idx: number) {

@@ -11,8 +11,11 @@ function writeText(value: string) {
 }
 
 async function readText() {
+  console.log("Reading")
   const clipboardItems = await navigator.clipboard.read()
+  console.log(clipboardItems)
   const clipboardItem = clipboardItems[0]
+  console.log(clipboardItem)
   const blob = await clipboardItem.getType(MIME_TYPE)
 
   if (blob) return await blob.text()

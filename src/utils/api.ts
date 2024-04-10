@@ -1,9 +1,9 @@
 import { useQuery } from "react-query"
 
+import { useAlerts } from "@app/hooks/alerts"
 import { useDebouncedValue } from "@app/hooks/debouncedValue"
 import { useFeedData } from "@app/hooks/feedData"
-
-import type { FeedTransform } from "./rules"
+import { FeedTransform } from "@app/utils/rules"
 
 type ApiDetails = Readonly<{
   hostname: string
@@ -102,11 +102,18 @@ export function useEncodedRules() {
   const feedData = useFeedData()
   const [{ feedUrl, rules: rulesWithIds }] = useDebouncedValue(feedData, 500)
 
+  const alerts = useAlerts()
+
   const rules = rulesWithIds.map((r) => r.rule)
 
   const { data } = useQuery({
     queryKey: ["encodedRules", feedUrl, rulesWithIds],
     queryFn: () => encodeRules({ feed_url: feedUrl, rules: rules }),
+    onError: (err) => {
+      console.error(err)
+      alerts.commands.error("Error occurred encoding rules to feed URL.")
+    },
+    retry: false,
     // Extremely unlikely to change so keep data for 10 minutes
     staleTime: 10 * 60 * 1000,
     cacheTime: 15 * 60 * 1000,
