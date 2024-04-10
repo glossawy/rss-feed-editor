@@ -26,13 +26,15 @@ FROM base as development
 
 EXPOSE 5000
 
+# Setup necessary files to run app then run as flask user
+# /app/app must be mounted in docker-compose.yml or manually
 RUN addgroup flask && \
   adduser -H -D -G flask flask
 
-USER flask
-
 COPY --from=builder /app/pyproject.toml /app/
 COPY --from=builder /app/poetry.lock /app/
-COPY --from=builder --chown=flask:flask /app/.venv /app/.venv
+COPY --from=builder /app/.venv /app/.venv
+
+USER flask
 
 CMD poetry run flask -A ./app/feed_editor --debug run --host '0.0.0.0' --port 5000

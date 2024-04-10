@@ -13,6 +13,7 @@ WORKDIR /app
 
 FROM base as builder
 
+# Setup build requirements
 RUN apk add --no-cache build-base libffi-dev && \
   pip install poetry
 
@@ -21,6 +22,8 @@ COPY ./pyproject.toml /app
 COPY ./poetry.lock /app
 COPY ./README.md /app
 
+# Install poetry deps and app package via pip, install gunicorn
+# this avoids needing the app source in the production image
 RUN poetry export -f requirements.txt -o requirements.txt && \
   poetry build && \
   python -m venv /app/.venv && \
@@ -30,11 +33,12 @@ RUN poetry export -f requirements.txt -o requirements.txt && \
 
 FROM base
 
+# Setup necessary files to run app then run as gunicorn user
 RUN addgroup gunicorn && \
   adduser -H -D -G gunicorn gunicorn
 
 COPY ./gunicorn.conf.py /app
-COPY --from=builder --chown=gunicorn:gunicorn /app/.venv /app/.venv
+COPY --from=builder /app/.venv /app/.venv
 
 USER gunicorn
 
