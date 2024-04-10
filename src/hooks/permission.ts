@@ -41,7 +41,7 @@ export default function usePermission(
           ? "assuming allowed"
           : "assuming disallowed"
 
-        console.log(
+        console.warn(
           `Browser does not support permission in current context: ${permissionName} (${permissionType}), ${assumption}`
         )
         setPermitted(defaultValue)
