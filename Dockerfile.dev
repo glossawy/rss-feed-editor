@@ -13,9 +13,9 @@ WORKDIR /app
 
 FROM base as builder
 
-RUN apk add --no-cache build-base libffi-dev
-RUN python -m venv /app/.venv
-RUN pip install poetry
+RUN apk add --no-cache build-base libffi-dev && \
+  python -m venv /app/.venv && \
+  pip install poetry
 
 COPY ./pyproject.toml /app
 COPY ./poetry.lock /app

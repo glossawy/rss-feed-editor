@@ -11,15 +11,10 @@ USER root
 RUN mkdir /app
 WORKDIR /app
 
-
-COPY ./gunicorn.conf.py /app
-
-
 FROM base as builder
 
-RUN apk add --no-cache build-base libffi-dev
-# RUN python -m venv /app/.venv
-RUN pip install poetry
+RUN apk add --no-cache build-base libffi-dev && \
+  pip install poetry
 
 COPY ./app /app/app
 COPY ./pyproject.toml /app
@@ -38,8 +33,9 @@ FROM base
 RUN addgroup gunicorn && \
   adduser -H -D -G gunicorn gunicorn
 
-USER gunicorn
-
+COPY ./gunicorn.conf.py /app
 COPY --from=builder --chown=gunicorn:gunicorn /app/.venv /app/.venv
+
+USER gunicorn
 
 CMD ["gunicorn", "-c", "/app/gunicorn.conf.py", "feed_editor:create_app()"]
