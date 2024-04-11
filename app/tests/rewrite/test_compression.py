@@ -1,6 +1,6 @@
 from tests.support.fixture_types import (
     ConditionFactories,
-    FeedRulesFactory,
+    FeedTransformFactory,
     RuleFactory,
 )
 
@@ -9,7 +9,7 @@ from feed_editor.rewrite.rules import conditions, mutations
 
 
 def test_compression__identity(
-    feed_rules_factory: FeedRulesFactory,
+    feed_transform_factory: FeedTransformFactory,
     rule_factory: RuleFactory,
     condition_factories: ConditionFactories,
 ):
@@ -19,7 +19,7 @@ def test_compression__identity(
     """
 
     conds = [
-        condition["test_factory"]("xpath") for condition in conditions.all_conditions
+        condition.__test_factory__("xpath") for condition in conditions.all_conditions
     ]
     conds = [
         *conds,
@@ -29,13 +29,17 @@ def test_compression__identity(
 
     condition = condition_factories.all_of(conds)
 
-    muts = [mutation["test_factory"]("xpath") for mutation in mutations.mutation_list]
+    muts = [mutation.__test_factory__("xpath") for mutation in mutations.all_mutations]
 
     rules = [rule_factory(condition=condition, mutations=muts) for _ in range(3)]
 
-    feed_rules = feed_rules_factory(feed_url="https://example.fake", rules=rules)
+    feed_transform = feed_transform_factory(
+        feed_url="https://example.fake", rules=rules
+    )
 
     assert (
-        compression.decode_and_decompress(compression.compress_and_encode(feed_rules))
-        == feed_rules
+        compression.decode_and_decompress(
+            compression.compress_and_encode(feed_transform)
+        )
+        == feed_transform
     )

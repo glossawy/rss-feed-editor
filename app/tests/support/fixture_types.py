@@ -6,11 +6,11 @@ from lxml.etree import _ElementTree as ElementTree
 from feed_editor.rewrite.rules.types import (
     AndDict,
     ConditionDict,
-    FeedRulesDict,
+    FeedTransformDict,
     MutationDict,
     OrDict,
     RuleDict,
-    SingleCondition,
+    SingleConditionDict,
 )
 from feed_editor.rss.models import Feed
 
@@ -40,7 +40,7 @@ class ConditionFactories(Protocol):
 
     def contains(
         self, xpath: str | None = None, contains: str | None = None
-    ) -> SingleCondition: ...
+    ) -> SingleConditionDict: ...
 
 
 class MutationFactories(Protocol):
@@ -64,7 +64,7 @@ class RuleFactory(Protocol):
     ) -> RuleDict: ...
 
 
-class FeedRulesFactory(Protocol):
+class FeedTransformFactory(Protocol):
     def __call__(
         self, feed_url: str, rules: int | list[RuleDict] = 1
-    ) -> FeedRulesDict: ...
+    ) -> FeedTransformDict: ...

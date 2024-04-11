@@ -1,73 +1,51 @@
 # pylint: disable=too-few-public-methods,missing-class-docstring
-import functools
-from typing import TYPE_CHECKING, Callable, Protocol, TypedDict
+import re
+from typing import (
+    TYPE_CHECKING,
+    Generic,
+    Optional,
+    Protocol,
+    TypeVar,
+    TypedDict,
+)
 
-from feed_editor.utils.dict_validation import _TypedDict_T, validate_dict
 
 if TYPE_CHECKING:
     from .types import ConditionDict
 
 
-def _require_args(dict_type: type[_TypedDict_T]):
-    def decorator(
-        predicate: Callable[[str, _TypedDict_T], bool]
-    ) -> Callable[[str, "ConditionArgs"], bool]:
-        @functools.wraps(predicate)
-        def decorated(value, args: "ConditionArgs"):
-            return predicate(value, validate_dict(dict_type, args))
-
-        return decorated
-
-    return decorator
-
-
 class ContainsArgs(TypedDict):
-    """Arguments to the contains condition"""
-
-    value: str
-
-
-@_require_args(ContainsArgs)
-def _contains(feed_value: str, args: ContainsArgs, /) -> bool:
-    return args["value"] in feed_value
-
-
-def _contains_testval(xpath: str) -> "ConditionDict":
-    return {"xpath": xpath, "name": "contains", "args": {"value": "test value"}}
+    pattern: str
 
 
 ConditionArgs = ContainsArgs
+ConditionArgsT = TypeVar("ConditionArgsT", bound=ConditionArgs)
 
 
-class ConditionFn(Protocol):  # pylint: disable=too-few-public-methods
-    """Required signature for a condition"""
+class Condition(Protocol, Generic[ConditionArgsT]):
+    ArgSpec: type[ConditionArgsT]
+    name: str
 
-    @staticmethod
-    def __call__(value: str, args: ConditionArgs, /) -> bool: ...
+    def __call__(self, feed_value: str, args: ConditionArgsT) -> bool: ...
 
-
-class TestFactory(Protocol):
-    def __call__(self, xpath: str) -> "ConditionDict": ...
-
-
-class Condition(TypedDict):
-    """Base TypedDict for a Condition"""
-
-    display_name: str
-    definition: ConditionFn
-    arg_spec: type[ConditionArgs]
-    test_factory: TestFactory
+    def __test_factory__(
+        self, xpath: str, args: Optional[ConditionArgsT] = None
+    ) -> "ConditionDict": ...
 
 
-all_conditions: list[Condition] = [
-    {
-        "display_name": "contains",
-        "definition": _contains,
-        "arg_spec": ContainsArgs,
-        "test_factory": _contains_testval,
-    }
-]
+class Contains(Condition[ContainsArgs]):
+    ArgSpec = ContainsArgs
+    name = "contains"
 
-conditions_map: dict[str, Condition] = {
-    cond["display_name"]: cond for cond in all_conditions
-}
+    def __call__(self, feed_value: str, args: ContainsArgs) -> bool:
+        return re.search(args["pattern"], feed_value) is not None
+
+    def __test_factory__(
+        self, xpath: str, args: ContainsArgs | None = None
+    ) -> "ConditionDict":
+        args = args or {"pattern": ".+?"}
+        return {"xpath": xpath, "name": self.name, "args": args}
+
+
+all_conditions: list[Condition] = [condcls() for condcls in Condition.__subclasses__()]
+conditions_map: dict[str, Condition] = {cond.name: cond for cond in all_conditions}

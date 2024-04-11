@@ -10,7 +10,7 @@ from feed_editor.rewrite.compression import (
 )
 from feed_editor.rewrite.rewriter import FeedRewriter
 from feed_editor.rewrite.rules import validate_dict, validate_xpaths
-from feed_editor.rewrite.rules.types import FeedRulesDict
+from feed_editor.rewrite.rules.types import FeedTransformDict
 
 rewrite_api = Blueprint("rewrite", __name__, url_prefix="/rewrite")
 
@@ -64,7 +64,7 @@ def url():
     return compress_and_encode(feed_dict)
 
 
-def _parse_args(params: Mapping[str, str]) -> FeedRulesDict:
+def _parse_args(params: Mapping[str, str]) -> FeedTransformDict:
     feed_data_gzipped: str | None = params.get("r", None)
 
     if feed_data_gzipped:

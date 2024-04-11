@@ -5,7 +5,7 @@ from typing import cast
 import validators  # type: ignore
 
 from feed_editor.rewrite.rules import run_rule
-from feed_editor.rewrite.rules.types import FeedRulesDict
+from feed_editor.rewrite.rules.types import FeedTransformDict
 from feed_editor.rss.errors import FeedError
 from feed_editor.rss.fetch import Feed
 from feed_editor.rss.fetch import fetch_feed as rss_fetch
@@ -19,7 +19,7 @@ class FeedRewriter:
     to the rewritten feed
     """
 
-    feed_rules: FeedRulesDict
+    feed_transform: FeedTransformDict
 
     @property
     def is_valid_feed(self) -> bool:
@@ -29,7 +29,7 @@ class FeedRewriter:
     @property
     def feed_url(self) -> str:
         """Get the URL of the feed being rewritten"""
-        return self.feed_rules["feed_url"]
+        return self.feed_transform["feed_url"]
 
     @cached_property
     def feed(self) -> Feed:
@@ -41,7 +41,7 @@ class FeedRewriter:
         """A rewritten version of the original feed after all rules are applied"""
         new_feed = self.feed.copy()
 
-        for rule_dict in self.feed_rules["rules"]:
+        for rule_dict in self.feed_transform["rules"]:
             run_rule(new_feed.tree, rule_dict)
 
         return new_feed

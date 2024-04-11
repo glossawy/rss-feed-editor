@@ -1,7 +1,10 @@
 {
+  "version": 1,
   "feed_url": "https://example.fake",
   "rules": [
     {
+      "rid": "1",
+      "name": "Replace NASA with ROSCOM",
       "xpath": "//channel/item",
       "condition": {
         "any_of": [
@@ -9,7 +12,7 @@
             "xpath": "title",
             "name": "contains",
             "args": {
-              "value": "NASA"
+              "pattern": "NASA"
             }
           }
         ]
@@ -36,6 +39,8 @@
       ]
     },
     {
+      "rid": "2",
+      "name": "Remove Articles for Astronauts and Space station",
       "xpath": "//channel/item",
       "condition": {
         "all_of": [
@@ -43,14 +48,14 @@
             "xpath": "title",
             "name": "contains",
             "args": {
-              "value": "Astronaut"
+              "pattern": "Astronaut"
             }
           },
           {
             "xpath": "title",
             "name": "contains",
             "args": {
-              "value": "Space Station"
+              "pattern": "Space Station"
             }
           }
         ]

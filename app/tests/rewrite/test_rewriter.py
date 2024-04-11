@@ -6,7 +6,7 @@ import pytest
 from tests.support.fixture_types import (
     ConditionFactories,
     FeedFactory,
-    FeedRulesFactory,
+    FeedTransformFactory,
     RuleFactory,
 )
 
@@ -15,26 +15,28 @@ from feed_editor.rss.errors import FeedError
 from feed_editor.rss.models import Feed
 
 
-def test_feed_rewriter__is_valid_feed__valid(feed_rules_factory: FeedRulesFactory):
-    rewriter = FeedRewriter(feed_rules_factory(feed_url="https://example.fake"))
+def test_feed_rewriter__is_valid_feed__valid(
+    feed_transform_factory: FeedTransformFactory,
+):
+    rewriter = FeedRewriter(feed_transform_factory(feed_url="https://example.fake"))
 
     assert rewriter.is_valid_feed
 
 
 def test_feed_rewriter__is_valid_feed__invalid_url(
-    feed_rules_factory: FeedRulesFactory,
+    feed_transform_factory: FeedTransformFactory,
 ):
-    rewriter = FeedRewriter(feed_rules_factory(feed_url="not-a-valid-url"))
+    rewriter = FeedRewriter(feed_transform_factory(feed_url="not-a-valid-url"))
 
     assert not rewriter.is_valid_feed
 
 
 @patch("feed_editor.rewrite.rewriter.rss_fetch")
 def test_feed_rewriter__feed(
-    rss_fetch: MagicMock, feed_rules_factory: FeedRulesFactory
+    rss_fetch: MagicMock, feed_transform_factory: FeedTransformFactory
 ):
     feed_url = "https://example.fake"
-    rewriter = FeedRewriter(feed_rules_factory(feed_url=feed_url))
+    rewriter = FeedRewriter(feed_transform_factory(feed_url=feed_url))
     feed = MagicMock()
 
     rss_fetch.return_value = feed
@@ -45,10 +47,10 @@ def test_feed_rewriter__feed(
 
 @patch("feed_editor.rewrite.rewriter.rss_fetch")
 def test_feed_rewriter__feed__caching(
-    rss_fetch: MagicMock, feed_rules_factory: FeedRulesFactory
+    rss_fetch: MagicMock, feed_transform_factory: FeedTransformFactory
 ):
     feed_url = "https://example.fake"
-    rewriter = FeedRewriter(feed_rules_factory(feed_url=feed_url))
+    rewriter = FeedRewriter(feed_transform_factory(feed_url=feed_url))
     feed = MagicMock()
 
     rss_fetch.return_value = feed
@@ -62,7 +64,7 @@ def test_feed_rewriter__feed__caching(
 def test_feed_rewriter__rewritten_feed(
     rss_fetch: MagicMock,
     run_rule: MagicMock,
-    feed_rules_factory: FeedRulesFactory,
+    feed_transform_factory: FeedTransformFactory,
     rule_factory: RuleFactory,
     condition_factories: ConditionFactories,
 ):
@@ -71,11 +73,11 @@ def test_feed_rewriter__rewritten_feed(
     rule_1 = rule_factory(condition=condition_factories.contains(contains="rule1"))
     rule_2 = rule_factory(condition=condition_factories.contains(contains="rule2"))
 
-    feed_rules_dict = feed_rules_factory(
+    feed_transform = feed_transform_factory(
         feed_url=feed_url,
         rules=[rule_1, rule_2],
     )
-    rewriter = FeedRewriter(feed_rules_dict)
+    rewriter = FeedRewriter(feed_transform)
 
     mock_feed: MagicMock = create_autospec(Feed, instance=True)
     mock_feed.tree = sentinel.tree
@@ -99,12 +101,12 @@ def test_feed_rewriter__rewritten_feed(
 def test_feed_rewriter__mime_type(
     rss_fetch: MagicMock,
     feed_factory: FeedFactory,
-    feed_rules_factory: FeedRulesFactory,
+    feed_transform_factory: FeedTransformFactory,
     feed_fixture_name,
     mime_type,
 ):
     feed_url = "https://example.fake"
-    rewriter = FeedRewriter(feed_rules_factory(feed_url=feed_url))
+    rewriter = FeedRewriter(feed_transform_factory(feed_url=feed_url))
 
     feed = feed_factory(feed_fixture_name)
     rss_fetch.return_value = feed
@@ -115,9 +117,9 @@ def test_feed_rewriter__mime_type(
 
 @patch("feed_editor.rewrite.rewriter.rss_fetch")
 def test_feed_rewriter__mime_type__unknown_feed_type(
-    rss_fetch: MagicMock, feed_rules_factory: FeedRulesFactory
+    rss_fetch: MagicMock, feed_transform_factory: FeedTransformFactory
 ):
-    rewriter = FeedRewriter(feed_rules_factory(feed_url="https://example.fake"))
+    rewriter = FeedRewriter(feed_transform_factory(feed_url="https://example.fake"))
 
     mock_feed = create_autospec(Feed, instance=True)
     mock_feed.feed_type = "mysterious-feed"
