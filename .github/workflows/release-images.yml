@@ -33,7 +33,7 @@ jobs:
           images: |
             glossawy/rss-feed-editor
           tags: |
-            type=match,pattern=v\d.\d,group=0,value=1.4
+            type=match,pattern=v\d.\d,group=0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -68,7 +68,7 @@ jobs:
           images: |
             glossawy/rss-feed-editor-frontend
           tags: |
-            type=match,pattern=v\d.\d,group=0,value=1.4
+            type=match,pattern=v\d.\d,group=0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
