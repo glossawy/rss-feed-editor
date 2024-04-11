@@ -8,6 +8,7 @@ COPY ./tsconfig.node.json /app
 COPY ./package.json /app
 COPY ./vite.config.ts /app
 COPY ./src /app/src
+COPY ./public /app/public
 COPY ./index.html /app
 COPY ./bun.lockb /app
 
