@@ -5,7 +5,7 @@ import {
   FeedTransformContext,
   FeedTransformDispatchContext,
   RuleWithoutMetadata,
-  initialFeedData as initialFeedTransform,
+  exampleTransform as initialFeedTransform,
   useStoredFeedTransform,
 } from "@app/hooks/feedTransform"
 import collections from "@app/utils/collections"
