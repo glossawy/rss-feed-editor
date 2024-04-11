@@ -3,7 +3,7 @@ import { CssBaseline, CssVarsProvider, Grid, Stack, Typography } from "@mui/joy"
 import AlertProvider from "@app/components/AlertProvider"
 import DarkModeToggle from "@app/components/DarkModeToggle"
 import FeedDataImportButton from "@app/components/FeedDataImportButton"
-import { FeedDataProvider } from "@app/components/FeedDataProvider"
+import { FeedTransformProvider } from "@app/components/FeedDataProvider"
 import FeedDataResetButton from "@app/components/FeedDataResetButton"
 import FeedUrlForm from "@app/components/FeedUrlForm"
 import PopupAlertDisplay from "@app/components/PopupAlertDisplay"
@@ -23,7 +23,7 @@ function App() {
       disableNestedContext
     >
       <CssBaseline />
-      <FeedDataProvider>
+      <FeedTransformProvider>
         <AlertProvider>
           <Stack sx={{ marginY: 4, marginX: 8 }} spacing={2}>
             <Grid container>
@@ -46,7 +46,7 @@ function App() {
             <PopupAlertDisplay />
           </Stack>
         </AlertProvider>
-      </FeedDataProvider>
+      </FeedTransformProvider>
     </CssVarsProvider>
   )
 }

@@ -2,7 +2,7 @@ import { useQuery } from "react-query"
 
 import { useAlerts } from "@app/hooks/alerts"
 import { useDebouncedValue } from "@app/hooks/debouncedValue"
-import { useFeedData } from "@app/hooks/feedData"
+import { useFeedTransform } from "@app/hooks/feedTransform"
 import { FeedTransform } from "@app/utils/rules"
 
 type ApiDetails = Readonly<{
@@ -54,7 +54,7 @@ export function apiUrl(endpoint: string, queryParams?: Record<string, string>) {
   else return url
 }
 
-export async function encodeRules(rules: FeedTransform) {
+export async function encodeTransform(rules: FeedTransform) {
   const response = await fetch(apiUrl("/rewrite/url"), {
     method: "POST",
     headers: {
@@ -67,7 +67,7 @@ export async function encodeRules(rules: FeedTransform) {
   else throw new Error(`Failed to encode rules: ${response.status}`)
 }
 
-export async function decodeRules(
+export async function decodeTransform(
   encodedRules: string
 ): Promise<FeedTransform> {
   const response = await fetch(apiUrl("/rewrite/rules", { r: encodedRules }))
@@ -99,16 +99,19 @@ export async function getTransformedFeed(encodedRules: string) {
 }
 
 export function useEncodedRules() {
-  const feedData = useFeedData()
-  const [{ feedUrl, rules: rulesWithIds }] = useDebouncedValue(feedData, 500)
+  const rawFeedTransform = useFeedTransform()
+  const [feedTransform] = useDebouncedValue(rawFeedTransform, 500)
 
   const alerts = useAlerts()
 
-  const rules = rulesWithIds.map((r) => r.rule)
-
   const { data } = useQuery({
-    queryKey: ["encodedRules", feedUrl, rulesWithIds],
-    queryFn: () => encodeRules({ feed_url: feedUrl, rules: rules }),
+    queryKey: [
+      "encodedRules",
+      feedTransform.version,
+      feedTransform.feed_url,
+      feedTransform.rules,
+    ],
+    queryFn: () => encodeTransform(feedTransform),
     onError: (err) => {
       console.error(err)
       alerts.commands.error("Error occurred encoding rules to feed URL.")
@@ -121,7 +124,7 @@ export function useEncodedRules() {
     keepPreviousData: true,
   })
 
-  if (feedUrl === "") return ""
+  if (feedTransform.feed_url === "") return ""
 
   return data
 }

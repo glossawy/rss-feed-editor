@@ -13,24 +13,24 @@ from .mutations import mutation_map
 from .types import (
     AndDict,
     ConditionDict,
-    FeedRulesDict,
+    FeedTransformDict,
     MutationDict,
     OrDict,
     RuleDict,
 )
 
 
-def validate_dict(test_dict: Mapping) -> FeedRulesDict:
+def validate_dict(test_dict: Mapping) -> FeedTransformDict:
     """Validate that a dictionary represents a feed and rules to apply to it (FeedRulesDict)"""
-    return generic_validate_dict(FeedRulesDict, test_dict)
+    return generic_validate_dict(FeedTransformDict, test_dict)
 
 
-def validate_xpaths(feed_rules: FeedRulesDict) -> bool:
+def validate_xpaths(feed_transform: FeedTransformDict) -> bool:
     """Traverses the entire dictionary and ensures that all rules and their
     mutations and conditions have valid xpaths, primarily that they are non-empty.
 
     Args:
-        feed_rules (FeedRulesDict): Feed URL and transformation rules
+        feed_transform (FeedRulesDict): Feed URL and transformation rules
 
     Returns:
         bool: True if all xpaths are valid, False otherwise
@@ -63,7 +63,7 @@ def validate_xpaths(feed_rules: FeedRulesDict) -> bool:
             )
         )
 
-    return all(validate_rule_xpaths(rule) for rule in feed_rules["rules"])
+    return all(validate_rule_xpaths(rule) for rule in feed_transform["rules"])
 
 
 def test_conditions_element(
@@ -95,8 +95,7 @@ def test_conditions_element(
             return test_disjunction(condition)
 
         if condition["name"] in conditions_map:
-            cond_dict = conditions_map[condition["name"]]
-            cond = cond_dict["definition"]
+            cond = conditions_map[condition["name"]]
 
             if test_element is not None and test_element.text is not None:
                 return cond(test_element.text, condition["args"])
@@ -137,7 +136,7 @@ def run_mutations_element(
         mut = mutation_map[mutation_dict["name"]]
         args = mutation_dict["args"]
 
-        mut["definition"](target_element, args)
+        mut(target_element, args)
 
 
 def run_rule(tree: etree._ElementTree, rule: RuleDict) -> None:

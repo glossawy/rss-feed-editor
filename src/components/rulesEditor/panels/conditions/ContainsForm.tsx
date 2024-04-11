@@ -20,11 +20,11 @@ export default function ContainsForm({
         />
       </FormControl>
       <FormControl>
-        <FormLabel>Match Text</FormLabel>
+        <FormLabel>Match Text (Regular Expression)</FormLabel>
         <Input
-          value={condition.args.value}
+          value={condition.args.pattern}
           onChange={(e) =>
-            onChange({ ...condition, args: { value: e.target.value } })
+            onChange({ ...condition, args: { pattern: e.target.value } })
           }
         />
       </FormControl>

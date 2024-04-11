@@ -2,7 +2,7 @@ import { Sheet } from "@mui/joy"
 
 import EditableLabel from "@app/components/EditableLabel"
 import OrderedCardList from "@app/components/OrderedCardList"
-import { RuleWithMetadata } from "@app/hooks/feedData"
+import { Rule } from "@app/utils/rules"
 
 // TODO: Turn EditorSidebar list into reusable, generic OrderedCardList that allows arbitrary card contents
 // TODO: Use OrderedCardList to implement Condition tree editor using nested card lists, it will work but be gross
@@ -10,13 +10,13 @@ import { RuleWithMetadata } from "@app/hooks/feedData"
 // TODO: Use OrderedCardList to implement Mutations editor
 
 type Props = {
-  rules: RuleWithMetadata[]
+  rules: Rule[]
   onNewRule?: () => void
-  onRename: (rule: RuleWithMetadata) => void
-  onSelect: (rule: RuleWithMetadata) => void
-  onMoveUp: (rule: RuleWithMetadata) => void
-  onMoveDown: (rule: RuleWithMetadata) => void
-  onDelete: (rule: RuleWithMetadata) => void
+  onRename: (rule: Rule) => void
+  onSelect: (rule: Rule) => void
+  onMoveUp: (rule: Rule) => void
+  onMoveDown: (rule: Rule) => void
+  onDelete: (rule: Rule) => void
 }
 
 export default function EditorSidebar({
@@ -43,7 +43,7 @@ export default function EditorSidebar({
     >
       <OrderedCardList
         items={rules}
-        keyfn={(rule) => rule.id}
+        keyfn={(rule) => rule.rid}
         render={(rule) => (
           <EditableLabel
             label={rule.name}

@@ -2,15 +2,18 @@ import { FormControl, FormLabel, Input } from "@mui/joy"
 import React, { useCallback } from "react"
 import { useForm } from "react-hook-form"
 
-import { useFeedData, useFeedDataDispatch } from "@app/hooks/feedData"
+import {
+  useFeedTransform,
+  useFeedTransformDispatch,
+} from "@app/hooks/feedTransform"
 
 export type FormValues = {
   feedUrl: string
 }
 
 export default function FeedUrlForm() {
-  const { feedUrl } = useFeedData()
-  const dispatch = useFeedDataDispatch()
+  const { feed_url: feedUrl } = useFeedTransform()
+  const dispatch = useFeedTransformDispatch()
   const { register, handleSubmit } = useForm<FormValues>()
 
   const setUrl = useCallback(

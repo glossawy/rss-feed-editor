@@ -7,18 +7,18 @@ from feed_editor.rewrite.rules.conditions import ConditionArgs
 from feed_editor.rewrite.rules.mutations import MutationArgs
 from feed_editor.rewrite.rules.types import (
     ConditionDict,
-    FeedRulesDict,
+    FeedTransformDict,
     MutationDict,
-    MutationDictWithoutXPath,
     RuleDict,
-    SingleCondition,
-    SingleConditionWithoutXPath,
+    SingleConditionDict,
 )
 from feed_editor.utils.dict_validation import validate_dict
 
 # Each key in the feed dict must have a unique mapping here
 # otherwise it wont be minified. If there is a collision then
 # decoding will return invalid results.
+# used:
+# abcdefgmnoqrstuwyx
 KEY_MINIFY_MAP = {
     "feed_url": "f",
     "rules": "q",
@@ -28,6 +28,10 @@ KEY_MINIFY_MAP = {
     "xpath": "x",
     "name": "n",
     "args": "b",
+    # Feed Transform
+    "version": "g",
+    # Rules
+    "rid": "e",
     # Conditions
     "contains": "c",
     "all_of": "a",
@@ -36,8 +40,6 @@ KEY_MINIFY_MAP = {
     "remove": "r",
     "replace": "s",
     "changeTag": "t",
-    # contains
-    "value": "v",
     # replace
     "pattern": "p",
     "replacement": "u",
@@ -49,7 +51,7 @@ KEY_MINIFY_MAP = {
 KEY_EXPAND_MAP = {v: k for k, v in KEY_MINIFY_MAP.items()}
 
 
-def compress_and_encode(rules: FeedRulesDict) -> str:
+def compress_and_encode(rules: FeedTransformDict) -> str:
     """
     Takes a feed url and its transforms, minifies the dict, compresses it
     and urlsafe b64 encodes it
@@ -57,7 +59,7 @@ def compress_and_encode(rules: FeedRulesDict) -> str:
     return _gzip_encode(_simplify_feed_dict(rules))
 
 
-def decode_and_decompress(encoded: str) -> FeedRulesDict:
+def decode_and_decompress(encoded: str) -> FeedTransformDict:
     """
     Takes a minified version of the feed rules dict and decodes it, decompresses it,
     and un-minifies it.
@@ -87,11 +89,11 @@ def _json_dumps(data: Mapping) -> str:
     return json.dumps(data, separators=(",", ":"), indent=None)
 
 
-def _simplify_feed_dict(rules: FeedRulesDict) -> dict:
+def _simplify_feed_dict(rules: FeedTransformDict) -> dict:
     def simplify_dict(args: Mapping) -> dict:
         return {KEY_MINIFY_MAP[k]: v for k, v in args.items()}
 
-    def simplify_typed_dict(typed: Union[MutationDict, SingleCondition]) -> dict:
+    def simplify_typed_dict(typed: Union[MutationDict, SingleConditionDict]) -> dict:
         simple_dict = {
             KEY_MINIFY_MAP["name"]: typed["name"],
             KEY_MINIFY_MAP["args"]: simplify_dict(typed["args"]),
@@ -122,6 +124,8 @@ def _simplify_feed_dict(rules: FeedRulesDict) -> dict:
 
     def simplify_rule(rule: RuleDict):
         return {
+            KEY_MINIFY_MAP["rid"]: rule["rid"],
+            KEY_MINIFY_MAP["name"]: rule["name"],
             KEY_MINIFY_MAP["xpath"]: rule["xpath"],
             KEY_MINIFY_MAP["condition"]: simplify_condition(rule["condition"]),
             KEY_MINIFY_MAP["mutations"]: [
@@ -130,12 +134,13 @@ def _simplify_feed_dict(rules: FeedRulesDict) -> dict:
         }
 
     return {
+        KEY_MINIFY_MAP["version"]: rules["version"],
         KEY_MINIFY_MAP["feed_url"]: rules["feed_url"],
         KEY_MINIFY_MAP["rules"]: [simplify_rule(rule) for rule in rules["rules"]],
     }
 
 
-def _feedify_simple_dict(simple_dict: dict) -> FeedRulesDict:
+def _feedify_simple_dict(simple_dict: dict) -> FeedTransformDict:
     def feedify_condition_args_dict(simple_args: dict) -> ConditionArgs:
         return cast(
             ConditionArgs, {KEY_EXPAND_MAP[k]: v for k, v in simple_args.items()}
@@ -161,7 +166,7 @@ def _feedify_simple_dict(simple_dict: dict) -> FeedRulesDict:
                     for sc in simple_condition[KEY_MINIFY_MAP["any_of"]]
                 ]
             }
-        cond_dict: SingleConditionWithoutXPath = {
+        cond_dict: SingleConditionDict = {
             "name": simple_condition[KEY_MINIFY_MAP["name"]],
             "args": feedify_condition_args_dict(
                 simple_condition[KEY_MINIFY_MAP["args"]]
@@ -169,23 +174,25 @@ def _feedify_simple_dict(simple_dict: dict) -> FeedRulesDict:
         }
 
         if KEY_MINIFY_MAP["xpath"] in simple_condition:
-            return {**cond_dict, "xpath": simple_condition[KEY_MINIFY_MAP["xpath"]]}
+            cond_dict["xpath"] = simple_condition[KEY_MINIFY_MAP["xpath"]]
 
         return cond_dict
 
     def feedify_mutation(simple_mutation: dict) -> MutationDict:
-        mut_dict: MutationDictWithoutXPath = {
+        mut_dict: MutationDict = {
             "name": simple_mutation[KEY_MINIFY_MAP["name"]],
             "args": feedify_mutation_args_dict(simple_mutation[KEY_MINIFY_MAP["args"]]),
         }
 
         if KEY_MINIFY_MAP["xpath"] in simple_mutation:
-            return {**mut_dict, "xpath": simple_mutation[KEY_MINIFY_MAP["xpath"]]}
+            mut_dict["xpath"] = simple_mutation[KEY_MINIFY_MAP["xpath"]]
 
         return mut_dict
 
     def feedify_rule(simple_rule: dict) -> RuleDict:
         return {
+            "rid": simple_rule[KEY_MINIFY_MAP["rid"]],
+            "name": simple_rule[KEY_MINIFY_MAP["name"]],
             "xpath": simple_rule[KEY_MINIFY_MAP["xpath"]],
             "condition": feedify_condition(simple_rule[KEY_MINIFY_MAP["condition"]]),
             "mutations": [
@@ -198,11 +205,12 @@ def _feedify_simple_dict(simple_dict: dict) -> FeedRulesDict:
         KEY_MINIFY_MAP["feed_url"] not in simple_dict
         or KEY_MINIFY_MAP["rules"] not in simple_dict
     ):
-        return validate_dict(FeedRulesDict, simple_dict)
+        return validate_dict(FeedTransformDict, simple_dict)
 
     return validate_dict(
-        FeedRulesDict,
+        FeedTransformDict,
         {
+            "version": simple_dict[KEY_MINIFY_MAP["version"]],
             "feed_url": simple_dict[KEY_MINIFY_MAP["feed_url"]],
             "rules": [
                 feedify_rule(rule) for rule in simple_dict[KEY_MINIFY_MAP["rules"]]

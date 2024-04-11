@@ -8,8 +8,9 @@ from lxml.etree import _Element as Element
 from lxml.etree import _ElementTree as ElementTree
 from tests.support.fixture_types import (
     ConditionFactories,
-    FeedRulesFactory,
+    FeedTransformFactory,
     MutationFactories,
+    RuleFactory,
 )
 
 from feed_editor.rewrite.rules import (
@@ -21,11 +22,7 @@ from feed_editor.rewrite.rules import (
     test_conditions_element as match_conditions_element,
 )
 from feed_editor.rewrite.rules import validate_dict, validate_xpaths
-from feed_editor.rewrite.rules.types import (
-    MutationDictWithoutXPath,
-    RuleDict,
-    SingleConditionWithoutXPath,
-)
+from feed_editor.rewrite.rules.types import MutationDict, SingleConditionDict
 
 
 @pytest.fixture
@@ -46,19 +43,19 @@ def test_validate_dict__invalid_dict():
         validate_dict({"not": "correct"})
 
 
-def test_validate_dict__valid(feed_rules_factory: FeedRulesFactory):
-    validate_dict(feed_rules_factory(feed_url="example.fake", rules=3))
+def test_validate_dict__valid(feed_transform_factory: FeedTransformFactory):
+    validate_dict(feed_transform_factory(feed_url="example.fake", rules=3))
 
 
 @pytest.mark.parametrize(
     "invalid_xpath_at", ["rules.0", "rules.0.condition", "rules.0.mutations.0"]
 )
 def test_validate_xpaths__invalid_xpath_at_rule(
-    feed_rules_factory: FeedRulesFactory, invalid_xpath_at
+    feed_transform_factory: FeedTransformFactory, invalid_xpath_at
 ):
-    feed_rules = feed_rules_factory(feed_url="example.fake")
+    feed_transform = feed_transform_factory(feed_url="example.fake")
 
-    tmp: dict = cast(dict, feed_rules)
+    tmp: dict = cast(dict, feed_transform)
     for path in invalid_xpath_at.split("."):
         try:
             tmp = tmp[int(path)]
@@ -67,11 +64,11 @@ def test_validate_xpaths__invalid_xpath_at_rule(
 
     tmp["xpath"] = ""
 
-    assert not validate_xpaths(feed_rules)
+    assert not validate_xpaths(feed_transform)
 
 
-def test_validate_xpaths__valid(feed_rules_factory: FeedRulesFactory):
-    assert validate_xpaths(feed_rules_factory(feed_url="example.fake"))
+def test_validate_xpaths__valid(feed_transform_factory: FeedTransformFactory):
+    assert validate_xpaths(feed_transform_factory(feed_url="example.fake"))
 
 
 def test_test_conditions_element__single_condition(
@@ -97,7 +94,7 @@ def test_test_conditions_element__implied_xpath(
     assert title_element is not None
 
     condition_with_xpath = condition_factories.contains(contains="NASA")
-    condition: SingleConditionWithoutXPath = {
+    condition: SingleConditionDict = {
         "name": condition_with_xpath["name"],
         "args": condition_with_xpath["args"],
     }
@@ -221,7 +218,7 @@ def test_run_mutations_element__implied_xpath(
     assert title_element is not None
 
     mutation_with_xpath = mutation_factories.remove()
-    mutation: MutationDictWithoutXPath = {
+    mutation: MutationDict = {
         "name": mutation_with_xpath["name"],
         "args": mutation_with_xpath["args"],
     }
@@ -232,19 +229,19 @@ def test_run_mutations_element__implied_xpath(
 
 
 def test_run_rule(
+    rule_factory: RuleFactory,
     rss_tree: ElementTree,
     condition_factories: ConditionFactories,
     mutation_factories: MutationFactories,
 ):
     original_description_count = len(rss_tree.findall("//channel/item/description"))
-
-    rule: RuleDict = {
-        "xpath": "//channel/item",
-        "condition": condition_factories.all_of(
+    rule = rule_factory(
+        "//channel/item",
+        condition_factories.all_of(
             [condition_factories.contains(xpath="title", contains="NASA")]
         ),
-        "mutations": [mutation_factories.remove(xpath="description")],
-    }
+        [mutation_factories.remove(xpath="description")],
+    )
 
     run_rule(rss_tree, rule)
 
@@ -257,6 +254,7 @@ def test_run_rule(
 
 
 def test_apply_rule(
+    rule_factory: RuleFactory,
     rss_tree: ElementTree,
     condition_factories: ConditionFactories,
     mutation_factories: MutationFactories,
@@ -265,13 +263,13 @@ def test_apply_rule(
         e.text for e in rss_tree.findall("//channel/item/description")
     ]
 
-    rule: RuleDict = {
-        "xpath": "//channel/item",
-        "condition": condition_factories.all_of(
+    rule = rule_factory(
+        "//channel/item",
+        condition_factories.all_of(
             [condition_factories.contains(xpath="title", contains="NASA")]
         ),
-        "mutations": [mutation_factories.remove(xpath="description")],
-    }
+        [mutation_factories.remove(xpath="description")],
+    )
 
     result = apply_rule(rss_tree, rule)
 

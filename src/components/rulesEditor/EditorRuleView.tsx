@@ -12,14 +12,13 @@ import {
 } from "@mui/joy"
 import React, { useCallback } from "react"
 
-import { RuleWithMetadata } from "@app/hooks/feedData"
 import { Condition, Mutation, Rule } from "@app/utils/rules"
 
 import ConditionsPanel from "./panels/ConditionsPanel"
 import MutationsPanel from "./panels/MutationsPanel"
 
 type Props = {
-  rule: RuleWithMetadata | null
+  rule: Rule | null
   onChange: (rule: Rule) => void
 }
 
@@ -97,7 +96,7 @@ function RuleView({
   )
 }
 
-export default function EditorRuleView({ rule: ruleWithId, onChange }: Props) {
+export default function EditorRuleView({ rule, onChange }: Props) {
   return (
     <Sheet
       variant="outlined"
@@ -109,11 +108,7 @@ export default function EditorRuleView({ rule: ruleWithId, onChange }: Props) {
         maxHeight: "75vh",
       }}
     >
-      {ruleWithId ? (
-        <RuleView rule={ruleWithId.rule} onChange={onChange} />
-      ) : (
-        <EmptyView />
-      )}
+      {rule ? <RuleView rule={rule} onChange={onChange} /> : <EmptyView />}
     </Sheet>
   )
 }

@@ -1,11 +1,12 @@
 # pylint: disable=redefined-outer-name,protected-access,missing-function-docstring
 import random
+import uuid
 from typing import Literal, cast
 
 import pytest
 from tests.support.fixture_types import (
     ConditionFactories,
-    FeedRulesFactory,
+    FeedTransformFactory,
     MutationFactories,
     RuleFactory,
 )
@@ -13,11 +14,11 @@ from tests.support.fixture_types import (
 from feed_editor.rewrite.rules.types import (
     AndDict,
     ConditionDict,
-    FeedRulesDict,
+    FeedTransformDict,
     MutationDict,
     OrDict,
     RuleDict,
-    SingleCondition,
+    SingleConditionDict,
 )
 
 
@@ -40,16 +41,16 @@ class _ConditionFactories(ConditionFactories):
     def any_of(self, conditions: int | list[ConditionDict] = 1) -> OrDict:
         return cast(OrDict, self._aggregate_condition("any_of", conditions))
 
-    def _contains_factory(self, xpath=None, contains=None) -> SingleCondition:
+    def _contains_factory(self, xpath=None, contains=None) -> SingleConditionDict:
         return {
             "xpath": xpath or "webMaster",
             "name": "contains",
-            "args": {"value": contains or "Test"},
+            "args": {"pattern": contains or "Test"},
         }
 
     def contains(
         self, xpath: str | None = None, contains: str | None = None
-    ) -> SingleCondition:
+    ) -> SingleConditionDict:
         return self._contains_factory(xpath, contains)
 
 
@@ -97,8 +98,10 @@ def rule_factory(
                 )
                 for _ in range(mutations)
             ]
-
+        rule_id = uuid.uuid4().hex
         return {
+            "rid": rule_id,
+            "name": f"Rule #{rule_id}",
             "xpath": xpath or "//channel/item",
             "condition": condition or condition_factories.contains(),
             "mutations": mutations,
@@ -108,11 +111,11 @@ def rule_factory(
 
 
 @pytest.fixture
-def feed_rules_factory(rule_factory: RuleFactory) -> FeedRulesFactory:
-    def factory(feed_url, rules: int | list[RuleDict] = 1) -> FeedRulesDict:
+def feed_transform_factory(rule_factory: RuleFactory) -> FeedTransformFactory:
+    def factory(feed_url, rules: int | list[RuleDict] = 1) -> FeedTransformDict:
         if isinstance(rules, int):
             rules = [rule_factory() for _ in range(rules)]
 
-        return {"feed_url": feed_url, "rules": rules}
+        return {"version": 1, "feed_url": feed_url, "rules": rules}
 
     return factory

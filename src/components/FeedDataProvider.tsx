@@ -2,98 +2,100 @@ import { PropsWithChildren, useCallback } from "react"
 
 import {
   FeedAction,
-  FeedData,
-  FeedDataContext,
-  FeedDataDispatchContext,
-  RuleWithMetadata,
-  initialFeedData,
-} from "@app/hooks/feedData"
-import useLocalStorage from "@app/hooks/localStorage"
+  FeedTransformContext,
+  FeedTransformDispatchContext,
+  RuleWithoutMetadata,
+  initialFeedData as initialFeedTransform,
+  useStoredFeedTransform,
+} from "@app/hooks/feedTransform"
 import collections from "@app/utils/collections"
-import { LocalStorageKeys } from "@app/utils/defaults"
-import { Rule } from "@app/utils/rules"
+import { FeedTransform, Rule, nextRuleId } from "@app/utils/rules"
 
-export const FeedDataProvider = ({ children }: PropsWithChildren<object>) => {
-  const [storedFeedData, setStoredFeedData] = useLocalStorage(
-    LocalStorageKeys.feedData,
-    initialFeedData
-  )
+export const FeedTransformProvider = ({
+  children,
+}: PropsWithChildren<object>) => {
+  const [storedFeedTransform, setStoredTransform] =
+    useStoredFeedTransform(initialFeedTransform)
 
   const storedFeedDataDispatch = useCallback(
     (action: FeedAction) => {
-      const newFeed = feedDataReducer(storedFeedData, action)
-      setStoredFeedData(newFeed)
+      const newFeed = feedTransformReducer(storedFeedTransform, action)
+      setStoredTransform(newFeed)
     },
-    [storedFeedData, setStoredFeedData]
+    [storedFeedTransform, setStoredTransform]
   )
 
   return (
-    <FeedDataContext.Provider value={storedFeedData}>
-      <FeedDataDispatchContext.Provider value={storedFeedDataDispatch}>
+    <FeedTransformContext.Provider value={storedFeedTransform}>
+      <FeedTransformDispatchContext.Provider value={storedFeedDataDispatch}>
         {children}
-      </FeedDataDispatchContext.Provider>
-    </FeedDataContext.Provider>
+      </FeedTransformDispatchContext.Provider>
+    </FeedTransformContext.Provider>
   )
 }
 
-function feedDataReducer(feedData: FeedData, action: FeedAction): FeedData {
-  const ids = feedData.rules.map((r) => r.id)
-  let nextId = ids.length === 0 ? 1 : collections.max(ids)! + 1
-
-  const giveMetadata = (rule: Rule): RuleWithMetadata => ({
-    name: `Rule ${nextId}`,
-    id: nextId++,
-    rule,
-  })
+function feedTransformReducer(
+  feedTransform: FeedTransform,
+  action: FeedAction
+): FeedTransform {
+  const giveMetadata = (rule: RuleWithoutMetadata): Rule => {
+    const rid = nextRuleId()
+    return {
+      rid,
+      name: `A new rule`,
+      ...rule,
+    }
+  }
 
   switch (action.type) {
     case "add":
       return {
-        ...feedData,
-        rules: [...feedData.rules, giveMetadata(action.rule)],
+        ...feedTransform,
+        rules: [...feedTransform.rules, giveMetadata(action.rule)],
       }
     case "delete":
       return {
-        ...feedData,
-        rules: feedData.rules.filter((rule) => rule.id !== action.ruleId),
+        ...feedTransform,
+        rules: feedTransform.rules.filter((rule) => rule.rid !== action.ruleId),
       }
     case "setUrl":
-      return { ...feedData, feedUrl: action.feedUrl }
+      return { ...feedTransform, feed_url: action.feedUrl }
     case "replace":
       return {
-        ...feedData,
-        rules: feedData.rules.map((rule) =>
-          rule.id === action.ruleId ? { ...rule, rule: action.rule } : rule
+        ...feedTransform,
+        rules: feedTransform.rules.map((rule) =>
+          rule.rid === action.ruleId ? { ...rule, ...action.rule } : rule
         ),
       }
     case "shiftUp":
       return {
-        ...feedData,
+        ...feedTransform,
         rules: collections.shiftItemLeft(
-          feedData.rules,
-          (r) => r.id === action.ruleId
+          feedTransform.rules,
+          (r) => r.rid === action.ruleId
         ),
       }
     case "shiftDown":
       return {
-        ...feedData,
+        ...feedTransform,
         rules: collections.shiftItemRight(
-          feedData.rules,
-          (r) => r.id === action.ruleId
+          feedTransform.rules,
+          (r) => r.rid === action.ruleId
         ),
       }
     case "rawReplace":
       return {
-        ...feedData,
-        rules: feedData.rules.map((rule) =>
-          rule.id === action.ruleId ? action.rule : rule
+        ...feedTransform,
+        rules: feedTransform.rules.map((rule) =>
+          rule.rid === action.ruleId ? action.rule : rule
         ),
       }
     case "clear":
-      return { feedUrl: feedData.feedUrl, rules: initialFeedData.rules }
+      return { ...feedTransform, rules: initialFeedTransform.rules }
     case "set":
       return {
-        feedUrl: action.feedUrl,
+        ...feedTransform,
+        feed_url: action.feedUrl,
         rules: action.rules.map(giveMetadata),
       }
   }

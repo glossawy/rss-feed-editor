@@ -6,7 +6,7 @@ Sometimes you want to modify the content or structure of an Atom or RSS feed, sa
 
 ## Concepts
 
-At the foundation, transformation rules are constructed of a `Condition` (which can be made up of many conditions) and a set of `Mutation`s to perform. Together a condition + mutations makes a `Rule`. A feed URL and a set of rules is a feed transformation. Elements of a feed to apply a condition or rule to are determined using [XPath queries](https://developer.mozilla.org/en-US/docs/Web/XPath), an XPath starting with a slack (`/`) indicates an absolute XPath, an XPath without a leading slash is assumed to be relative to the rule's XPath. XPaths are optional for conditions and mutations, if they are missing they are applied to the elements matched by the rule's XPath.
+At the foundation, transformation rules are constructed of a `Condition` (which can be made up of many conditions) and a set of `Mutation`s to perform. Together a condition + mutations makes a `Rule`. A feed URL and a set of rules is a `Feed Transform`. Elements of a feed to apply a condition or rule to are determined using [XPath queries](https://developer.mozilla.org/en-US/docs/Web/XPath), an XPath starting with a slash (`/`) indicates an absolute XPath, an XPath without a leading slash is assumed to be relative to the rule's XPath. XPaths are optional for conditions and mutations, if they are missing they are applied to the elements matched by the rule's XPath.
 
 Currently the app supports the following conditions:
 
@@ -15,7 +15,7 @@ contains:
    Tests whether or not the text of the element contains a substring
 
    args:
-      value: Substring to match
+      pattern: Regular expression to match
 ```
 
 and the following mutations:
@@ -53,4 +53,3 @@ This uses `docker compose` to spin up the application locally hosted at `localho
 
 - For frontend only work: `make dev-frontend` or `bun run dev`
 - For API work: `make dev-backend`
-

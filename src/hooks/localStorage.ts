@@ -28,7 +28,7 @@ type KeyValue = (typeof LocalStorageKeys)[keyof typeof LocalStorageKeys]
 export default function useLocalStorage<T extends Storable>(
   key: KeyValue,
   initialValue: T
-): [T, (val: T) => void] {
+): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [value, setValue] = useState(() => {
     if (!window.localStorage) return initialValue
 

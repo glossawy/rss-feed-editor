@@ -1,22 +1,16 @@
 # flake8: noqa
 # pylint: skip-file
 
-from typing import TypedDict
+from typing import Literal, NotRequired, TypedDict
 
 from feed_editor.rewrite.rules.conditions import ConditionArgs
 from feed_editor.rewrite.rules.mutations import MutationArgs
 
 
-class SingleConditionWithoutXPath(TypedDict):
+class SingleConditionDict(TypedDict):
+    xpath: NotRequired[str]
     name: str
     args: "ConditionArgs"
-
-
-class SingleConditionWithXPath(SingleConditionWithoutXPath):
-    xpath: str
-
-
-SingleCondition = SingleConditionWithXPath | SingleConditionWithoutXPath
 
 
 class AndDict(TypedDict):
@@ -27,27 +21,24 @@ class OrDict(TypedDict):
     any_of: list["ConditionDict"]
 
 
-ConditionDict = AndDict | OrDict | SingleCondition
+ConditionDict = AndDict | OrDict | SingleConditionDict
 
 
-class MutationDictWithoutXPath(TypedDict):
+class MutationDict(TypedDict):
+    xpath: NotRequired[str]
     name: str
     args: "MutationArgs"
 
 
-class MutationDictWithXPath(MutationDictWithoutXPath):
-    xpath: str
-
-
-MutationDict = MutationDictWithXPath | MutationDictWithoutXPath
-
-
 class RuleDict(TypedDict):
+    rid: str
+    name: str
     condition: ConditionDict
     mutations: list[MutationDict]
     xpath: str
 
 
-class FeedRulesDict(TypedDict):
+class FeedTransformDict(TypedDict):
+    version: Literal[1]
     feed_url: str
     rules: list[RuleDict]

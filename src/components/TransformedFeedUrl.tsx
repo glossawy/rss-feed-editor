@@ -1,5 +1,5 @@
 import * as Icons from "@mui/icons-material"
-import { IconButton, Input } from "@mui/joy"
+import { IconButton, Input, Stack } from "@mui/joy"
 
 import useClipboard from "@app/hooks/clipboard"
 import { toRewriteUrl, useEncodedRules } from "@app/utils/api"
@@ -27,11 +27,20 @@ export default function TransformedFeedUrl() {
           isBlank(encodedRules) ? (
             <EmptyDecorator />
           ) : (
-            <>
-              <IconButton onClick={() => clipboard.write(rewriteUrl)}>
+            <Stack direction="row" spacing={0.5}>
+              <IconButton
+                onClick={() => clipboard.write(rewriteUrl)}
+                title="Copy link to clipboard"
+              >
                 <Icons.CopyAll />
               </IconButton>
-            </>
+              <IconButton
+                onClick={() => window.open(rewriteUrl, "_blank")}
+                title="Open feed in new tab"
+              >
+                <Icons.OpenInNew />
+              </IconButton>
+            </Stack>
           )
         }
       />
