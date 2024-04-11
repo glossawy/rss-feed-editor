@@ -9,8 +9,8 @@ from lxml.etree import _ElementTree as ElementTree
 from tests.support.fixture_types import (
     ConditionFactories,
     FeedTransformFactory,
-    RuleFactory,
     MutationFactories,
+    RuleFactory,
 )
 
 from feed_editor.rewrite.rules import (
@@ -22,10 +22,7 @@ from feed_editor.rewrite.rules import (
     test_conditions_element as match_conditions_element,
 )
 from feed_editor.rewrite.rules import validate_dict, validate_xpaths
-from feed_editor.rewrite.rules.types import (
-    MutationDict,
-    SingleConditionDict,
-)
+from feed_editor.rewrite.rules.types import MutationDict, SingleConditionDict
 
 
 @pytest.fixture

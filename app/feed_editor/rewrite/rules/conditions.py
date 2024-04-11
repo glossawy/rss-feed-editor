@@ -5,10 +5,9 @@ from typing import (
     Generic,
     Optional,
     Protocol,
-    TypeVar,
     TypedDict,
+    TypeVar,
 )
-
 
 if TYPE_CHECKING:
     from .types import ConditionDict

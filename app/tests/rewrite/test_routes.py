@@ -9,9 +9,9 @@ from tests.support.fixture_types import (
     ConditionFactories,
     FeedFactory,
     FeedTransformFactory,
-    RuleFactory,
     JsonLoader,
     MutationFactories,
+    RuleFactory,
 )
 
 from feed_editor.rewrite.compression import _gzip_encode, compress_and_encode

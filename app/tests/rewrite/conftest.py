@@ -1,7 +1,7 @@
 # pylint: disable=redefined-outer-name,protected-access,missing-function-docstring
 import random
-from typing import Literal, cast
 import uuid
+from typing import Literal, cast
 
 import pytest
 from tests.support.fixture_types import (

@@ -7,8 +7,8 @@ from typing import (
     NotRequired,
     Optional,
     Protocol,
-    TypeVar,
     TypedDict,
+    TypeVar,
     cast,
 )
 
