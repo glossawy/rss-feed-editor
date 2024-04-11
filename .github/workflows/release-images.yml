@@ -54,6 +54,8 @@ jobs:
           push: true
           tags: ${{ steps.meta_release.outputs.tags || steps.meta_push.outputs.tags }}
           labels: ${{ steps.meta_release.outputs.labels || steps.meta_push.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   push_frontend:
     name: Push Frontend Docker image to Docker Hub
@@ -96,3 +98,5 @@ jobs:
           push: true
           tags: ${{ steps.meta_release.outputs.tags || steps.meta_push.outputs.tags }}
           labels: ${{ steps.meta_release.outputs.labels || steps.meta_push.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
