@@ -1,4 +1,4 @@
-name: 'Python Checks'
+name: 'Code Checks'
 on:
   workflow_dispatch:
   push:
@@ -41,3 +41,16 @@ jobs:
           name: pytest-results
           path: junit/test-results.xml
         if: ${{ always() }}
+  lint-typescript:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: ESLint
+        run: bun run lint --color
