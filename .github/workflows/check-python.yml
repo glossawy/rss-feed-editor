@@ -1,0 +1,43 @@
+name: 'Python Checks'
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+permissions:
+  contents: read
+  pull-requests: read
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  lint-python:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python 3.12 with Poetry
+        uses: ./.github/actions/setup-python-deps
+      - name: Run Pylint
+        run: poetry run pylint -f colorized --score y ./app
+      - name: Run isort
+        run: poetry run isort -c ./app
+      - name: Run flake8
+        run: poetry run flake8 --show-source --statistics ./app
+  test-python:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python 3.12 with Poetry
+        uses: ./.github/actions/setup-python-deps
+      - name: Run Pytest
+        run: poetry run pytest --color=yes --doctest-modules --junitxml=junit/test-results.xml ./app/tests
+      - name: Upload pytest results
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results
+          path: junit/test-results.xml
+        if: ${{ always() }}

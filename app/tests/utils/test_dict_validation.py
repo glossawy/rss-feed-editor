@@ -21,16 +21,24 @@ def test_typed_dict_class():
 @pytest.mark.parametrize(
     "test_dict",
     [
-        pytest.param({}, marks=pytest.mark.xfail, id="empty-dict"),
         pytest.param({"a": "test", "b": 2}, id="field-not-required"),
-        pytest.param(
-            {"a": "test", "b": 2, "c": 3}, marks=pytest.mark.xfail, id="invalid-type"
-        ),
         pytest.param({"a": "test", "b": 2, "c": "c"}, id="valid"),
     ],
 )
 def test_validate_dict(test_typed_dict_class, test_dict: Mapping):
     assert validate_dict(test_typed_dict_class, test_dict) == test_dict
+
+
+@pytest.mark.parametrize(
+    "test_dict",
+    [
+        pytest.param({}, id="empty-dict"),
+        pytest.param({"a": "test", "b": 2, "c": 3}, id="invalid-type"),
+    ],
+)
+def test_validate_dict__invalid(test_typed_dict_class, test_dict: Mapping):
+    with pytest.raises(pydantic.ValidationError):
+        validate_dict(test_typed_dict_class, test_dict)
 
 
 @pytest.mark.parametrize(
