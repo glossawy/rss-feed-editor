@@ -1,8 +1,8 @@
-import { Condition, Mutation, Rule } from "./rules"
+import { Condition, Mutation, Rule, nextRuleId } from "@app/utils/rules"
 
 export const LocalStorageKeys = {
   colorMode: "color-mode", // change with caution, used in index.html
-  feedData: "feed-data:v1",
+  feedTransform: "feed-data:v1",
 } as const
 
 export const DefaultFactories = {
@@ -36,7 +36,7 @@ export const DefaultFactories = {
     contains(): Condition {
       return {
         name: "contains",
-        args: { value: "" },
+        args: { pattern: ".+?" },
       }
     },
     allOf(): Condition {
@@ -53,7 +53,10 @@ export const DefaultFactories = {
     return this.conditions.contains()
   },
   rule(): Rule {
+    const id = nextRuleId()
     return {
+      rid: id,
+      name: `Rule ${id}`,
       xpath: "//channel/item",
       condition: DefaultFactories.condition(),
       mutations: [DefaultFactories.mutation()],

@@ -19,6 +19,12 @@ export default function EditableLabel({ label, onChange }: Props) {
     setEditing(!editing)
   }
 
+  const onSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
+    onChange(text)
+    setEditing(false)
+    evt.preventDefault()
+  }
+
   return (
     <Stack direction={"row"} alignItems={"center"}>
       <Box
@@ -32,7 +38,9 @@ export default function EditableLabel({ label, onChange }: Props) {
           {editing ? <Icons.Save /> : <Icons.Edit />}
         </IconButton>
         {editing ? (
-          <Input value={text} onChange={(e) => setText(e.target.value)} />
+          <form onSubmit={onSubmit}>
+            <Input value={text} onChange={(e) => setText(e.target.value)} />
+          </form>
         ) : (
           <Typography>{text}</Typography>
         )}

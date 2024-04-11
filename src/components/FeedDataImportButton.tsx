@@ -15,7 +15,7 @@ export default function FeedDataImportButton() {
         <IconButton
           onClick={() => setShowModal(true)}
           size="lg"
-          title={`Import rules using feed URL in clipboard`}
+          title={`Open modal to import feed transform from saved URL`}
         >
           <Icons.Upload />
         </IconButton>

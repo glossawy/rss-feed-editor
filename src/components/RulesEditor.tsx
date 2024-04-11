@@ -2,10 +2,10 @@ import { Grid, Stack } from "@mui/joy"
 import { useCallback, useState } from "react"
 
 import {
-  RuleWithMetadata,
-  useFeedData,
-  useFeedDataDispatch,
-} from "@app/hooks/feedData"
+  RuleId,
+  useFeedTransform,
+  useFeedTransformDispatch,
+} from "@app/hooks/feedTransform"
 import { DefaultFactories } from "@app/utils/defaults"
 import { Rule } from "@app/utils/rules"
 
@@ -13,25 +13,25 @@ import EditorRuleView from "./rulesEditor/EditorRuleView"
 import EditorSidebar from "./rulesEditor/EditorSidebar"
 
 export default function RulesEditor() {
-  const [targetRuleId, setTargetRuleId] = useState<number | null>(null)
+  const [targetRuleId, setTargetRuleId] = useState<RuleId | null>(null)
 
-  const { rules } = useFeedData()
-  const dispatch = useFeedDataDispatch()
+  const { rules } = useFeedTransform()
+  const dispatch = useFeedTransformDispatch()
 
-  const targetRule = rules.find((r) => r.id == targetRuleId)
+  const targetRule = rules.find((r) => r.rid == targetRuleId)
 
   const handleRuleSelect = useCallback(
-    (rule: RuleWithMetadata) => {
-      setTargetRuleId(rule.id)
+    (rule: Rule) => {
+      setTargetRuleId(rule.rid)
     },
     [setTargetRuleId]
   )
 
   const handleRename = useCallback(
-    (rule: RuleWithMetadata) => {
+    (rule: Rule) => {
       dispatch({
         type: "rawReplace",
-        ruleId: rule.id,
+        ruleId: rule.rid,
         rule: rule,
       })
     },
@@ -39,30 +39,30 @@ export default function RulesEditor() {
   )
 
   const handleMoveUp = useCallback(
-    (rule: RuleWithMetadata) => {
+    (rule: Rule) => {
       dispatch({
         type: "shiftUp",
-        ruleId: rule.id,
+        ruleId: rule.rid,
       })
     },
     [dispatch]
   )
 
   const handleDelete = useCallback(
-    (rule: RuleWithMetadata) => {
+    (rule: Rule) => {
       dispatch({
         type: "delete",
-        ruleId: rule.id,
+        ruleId: rule.rid,
       })
     },
     [dispatch]
   )
 
   const handleMoveDown = useCallback(
-    (rule: RuleWithMetadata) => {
+    (rule: Rule) => {
       dispatch({
         type: "shiftDown",
-        ruleId: rule.id,
+        ruleId: rule.rid,
       })
     },
     [dispatch]
@@ -81,7 +81,7 @@ export default function RulesEditor() {
 
       dispatch({
         type: "replace",
-        ruleId: targetRule.id,
+        ruleId: targetRule.rid,
         rule,
       })
     },

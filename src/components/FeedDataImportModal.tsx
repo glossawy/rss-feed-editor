@@ -13,8 +13,8 @@ import {
 import { useForm } from "react-hook-form"
 
 import { useAlerts } from "@app/hooks/alerts"
-import { useFeedDataDispatch } from "@app/hooks/feedData"
-import { decodeRules, extractFromRewriteUrl } from "@app/utils/api"
+import { useFeedTransformDispatch } from "@app/hooks/feedTransform"
+import { decodeTransform, extractFromRewriteUrl } from "@app/utils/api"
 
 type Props = {
   show?: boolean
@@ -29,7 +29,7 @@ export default function FeedDataImportModal({ show = false, onClose }: Props) {
   const { register, handleSubmit, formState, reset, setError } =
     useForm<FormData>()
   const { commands: alerts } = useAlerts()
-  const dispatch = useFeedDataDispatch()
+  const dispatch = useFeedTransformDispatch()
 
   const onSubmit = async (data: FormData) => {
     const encodedValue = extractFromRewriteUrl(data.url)
@@ -38,7 +38,7 @@ export default function FeedDataImportModal({ show = false, onClose }: Props) {
     if (encodedValue == null) return
 
     try {
-      const transform = await decodeRules(decodeURIComponent(encodedValue))
+      const transform = await decodeTransform(decodeURIComponent(encodedValue))
 
       dispatch({
         type: "set",

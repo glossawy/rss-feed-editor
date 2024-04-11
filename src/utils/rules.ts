@@ -27,7 +27,7 @@ const ConditionBase = XPathBase
 export const ContainsCondition = ConditionBase.extend({
   name: z.literal("contains"),
   args: z.object({
-    value: z.string(),
+    pattern: z.string(),
   }),
 })
 
@@ -83,6 +83,8 @@ export type Mutation = z.infer<typeof Mutation>
 /// RULES / FEED TRANSFORM
 
 export const Rule = z.object({
+  rid: z.string(),
+  name: z.string(),
   xpath: z
     .string()
     .startsWith(
@@ -95,8 +97,16 @@ export const Rule = z.object({
 export type Rule = z.infer<typeof Rule>
 
 export const FeedTransform = z.object({
+  version: z.literal(1),
   feed_url: z.string().url(),
   rules: Rule.array(),
 })
 
 export type FeedTransform = z.infer<typeof FeedTransform>
+
+export const nextRuleId = isSecureContext
+  ? () => crypto.randomUUID()
+  : () =>
+      [...Array(40)]
+        .map(() => Math.floor(Math.random() * 16).toString(16))
+        .join("")
