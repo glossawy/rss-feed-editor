@@ -5,6 +5,8 @@ on:
     workflows:
       - Python Checks
       - Typescript Checks
+    branches-ignore:
+      - main
     types:
       - completed
 
