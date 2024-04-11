@@ -19,5 +19,5 @@ jobs:
         run: docker compose build app
       - name: Build Cross-Platform Production Images
         run: |
-          docker buildx build --platform linux/arm64,linux/amd64 -t glossawy/rss-feed-editor:verify -f Dockerfile.frontend . --load
-          docker buildx build --platform linux/arm64,linux/amd64 -t glossawy/rss-feed-editor-frontend:verify -f Dockerfile.frontend . --load
+          docker buildx build --platform linux/arm64,linux/amd64 -t glossawy/rss-feed-editor:verify -f Dockerfile .
+          docker buildx build --platform linux/arm64,linux/amd64 -t glossawy/rss-feed-editor-frontend:verify -f Dockerfile.frontend .
