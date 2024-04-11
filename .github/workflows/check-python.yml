@@ -21,11 +21,11 @@ jobs:
       - name: Setup Python 3.12 with Poetry
         uses: ./.github/actions/setup-python-deps
       - name: Run Pylint
-        run: poetry run pylint ./app
+        run: poetry run pylint -f colorized --score y ./app
       - name: Run isort
-        run: poetry run isort ./app
+        run: poetry run isort -c ./app
       - name: Run flake8
-        run: poetry run flake8 ./app
+        run: poetry run flake8 --show-source --statistics ./app
   test-python:
     runs-on: ubuntu-22.04
     steps:
@@ -34,7 +34,7 @@ jobs:
       - name: Setup Python 3.12 with Poetry
         uses: ./.github/actions/setup-python-deps
       - name: Run Pytest
-        run: pytest ./app/tests --doctest-modules --junitxml=junit/test-results.xml
+        run: poetry run pytest --color=yes --doctest-modules --junitxml=junit/test-results.xml ./app/tests
       - name: Upload pytest results
         uses: actions/upload-artifact@v4
         with:
