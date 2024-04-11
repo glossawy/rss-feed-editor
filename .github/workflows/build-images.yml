@@ -1,0 +1,19 @@
+name: Docker Image Builds
+on:
+  workflow_dispatch:
+  pull_request:
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set up docker buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build Development Image
+        run: docker compose build app
+      - name: Build Cross-Platform Production Images
+        run: make build-images
