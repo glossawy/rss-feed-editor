@@ -1,14 +1,7 @@
 name: Docker Image Builds
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - Python Checks
-      - Typescript Checks
-    branches-ignore:
-      - main
-    types:
-      - completed
+  pull_request:
 
 concurrency:
   group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
