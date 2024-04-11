@@ -8,16 +8,51 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-dev:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build Development Image
+        uses: docker/build-push-action@v5
+        with:
+          file: ./Dockerfile.dev
+          context: .
+          platforms: linux/arm64,linux/amd64
+          tags: glossawy/rss-feed-editor:dev
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+  build-backend:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Set up docker buildx
         uses: docker/setup-buildx-action@v3
-      - name: Build Development Image
-        run: docker compose build app
-      - name: Build Cross-Platform Production Images
-        run: |
-          docker buildx build --platform linux/arm64,linux/amd64 -t glossawy/rss-feed-editor:verify -f Dockerfile .
-          docker buildx build --platform linux/arm64,linux/amd64 -t glossawy/rss-feed-editor-frontend:verify -f Dockerfile.frontend .
+      - name: Build Backend Image
+        uses: docker/build-push-action@v5
+        with:
+          file: ./Dockerfile
+          context: .
+          platforms: linux/arm64,linux/amd64
+          tags: glossawy/rss-feed-editor:verify
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+  build-frontend:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up docker buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          file: ./Dockerfile.frontend
+          context: .
+          platforms: linux/arm64,linux/amd64
+          tags: glossawy/rss-feed-editor-frontend:verify
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
