@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect } from "react"
 
 import useLocalStorage from "@app/hooks/localStorage"
-import { DefaultFactories, LocalStorageKeys } from "@app/utils/defaults"
+import { LocalStorageKeys } from "@app/utils/defaults"
 import migrate from "@app/utils/migration"
 import { FeedTransform, Rule } from "@app/utils/rules"
 
@@ -22,32 +22,67 @@ export type FeedAction =
   | { type: "shiftDown"; ruleId: RuleId }
   | { type: "clear" }
 
-export const initialFeedData: FeedTransform = {
+export const exampleTransform: FeedTransform = {
   version: 1,
   feed_url: "https://www.rssboard.org/files/sample-rss-2.xml",
   rules: [
-    DefaultFactories.rule(),
-    DefaultFactories.rule(),
     {
-      rid: "3",
-      name: "Rule 3",
-      xpath: "//channel/item",
-      condition: DefaultFactories.condition(),
-      mutations: [
-        DefaultFactories.mutation(),
-        {
-          name: "changeTag",
-          args: {
-            tag: "test",
+      rid: "3fd34096-3ad8-410f-8080-972c5045b713",
+      name: "Remove NASA + Space Station Articles",
+      condition: {
+        all_of: [
+          {
+            args: {
+              pattern: "NASA",
+            },
+            name: "contains",
+            xpath: "title",
           },
+          {
+            args: {
+              pattern: "Space Station",
+            },
+            name: "contains",
+            xpath: "title",
+          },
+        ],
+      },
+      mutations: [
+        {
+          args: {},
+          name: "remove",
         },
       ],
+      xpath: "//channel/item",
+    },
+    {
+      rid: "71850834-5d40-4cf8-8e9b-3c598082b19e",
+      name: "Change NASA to ROSCOM",
+      condition: {
+        args: {
+          pattern: "NASA",
+        },
+        name: "contains",
+        xpath: "title",
+      },
+      mutations: [
+        {
+          args: {
+            pattern: "NASA",
+            replacement: "ROSCOM",
+            trim: false,
+          },
+          name: "replace",
+          xpath: "title",
+        },
+      ],
+      xpath: "//channel/item",
     },
   ],
 }
 
 export const FeedTransformContext = createContext<FeedTransform>({
-  ...initialFeedData,
+  ...exampleTransform,
 })
 export const FeedTransformDispatchContext = createContext<
   React.Dispatch<FeedAction>

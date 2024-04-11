@@ -1,4 +1,4 @@
-import { initialFeedData } from "@app/hooks/feedTransform"
+import { exampleTransform } from "@app/hooks/feedTransform"
 import { FeedTransform, Rule } from "@app/utils/rules"
 
 type RuleWithoutMetadata = {
@@ -19,7 +19,7 @@ export default function migrate(
 ): FeedTransform {
   // Move unversioned feed transforms up to V1
   if (!("version" in feedTransform)) {
-    feedTransform = initialFeedData
+    feedTransform = exampleTransform
   }
 
   if ("version" in feedTransform && feedTransform["version"] >= 1) {
