@@ -1,6 +1,6 @@
 import { CloseRounded } from "@mui/icons-material"
 import { Alert, IconButton, Stack, Typography } from "@mui/joy"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import { AlertId, AlertType, useAlerts } from "@app/hooks/alerts"
 
@@ -31,34 +31,28 @@ export default function PopupAlertDisplay() {
     commands: { clear },
   } = useAlerts()
 
-  // Clear out used alerts
-  useEffect(() => {
-    const alertIds = new Set(alerts.map((a) => a.id))
-    const clearedIds = Array.from(alertTimeouts.keys()).filter(
-      (alertId) => !alertIds.has(alertId)
-    )
+  const alertIds = new Set(alerts.map((a) => a.id))
+  const clearedIds = Array.from(alertTimeouts.keys()).filter(
+    (alertId) => !alertIds.has(alertId)
+  )
 
-    if (clearedIds.length === 0) return
-
+  if (clearedIds.length > 0) {
     const newAlertTimeouts = new Map(alertTimeouts)
-    clearedIds.forEach((alertId) => newAlertTimeouts.delete(alertId))
+    clearedIds.forEach((id) => newAlertTimeouts.delete(id))
 
     setAlertTimeouts(newAlertTimeouts)
-  }, [alerts, alertTimeouts, setAlertTimeouts])
+  }
 
-  // Initiate timeouts for new alerts
-  useEffect(() => {
-    alerts.forEach((alert) => {
-      if (alertTimeouts.has(alert.id)) return
+  alerts.forEach((alert) => {
+    if (alertTimeouts.has(alert.id)) return
 
-      alertTimeouts.set(
-        alert.id,
-        setTimeout(() => {
-          clear(alert.id)
-        }, alert.durationMillis)
-      )
-    })
-  }, [alerts, alertTimeouts, clear])
+    alertTimeouts.set(
+      alert.id,
+      setTimeout(() => {
+        clear(alert.id)
+      }, alert.durationMillis)
+    )
+  })
 
   const handleClose = (alertId: AlertId) => {
     return () => clear(alertId)

@@ -13,7 +13,7 @@ import useLocalStorage from "@app/hooks/localStorage"
 import { LocalStorageKeys } from "@app/utils/defaults"
 
 function App() {
-  const [colorMode] = useLocalStorage(LocalStorageKeys.colorMode, "light")
+  const [colorMode] = useLocalStorage(LocalStorageKeys.colorMode, "system")
 
   return (
     <CssVarsProvider
