@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useSyncExternalStore } from "react"
 
 import { LocalStorageKeys } from "@app/utils/defaults"
 
@@ -11,38 +11,49 @@ export type Storable =
   | Storable[]
   | { [key: string]: Storable }
 
-function coerce<T extends Storable>(
-  value: string,
-  { fallback }: { fallback: T }
-): T {
-  try {
-    return JSON.parse(value) as T
-  } catch (e) {
-    console.error(e)
-    return fallback
-  }
+type KeyValue = (typeof LocalStorageKeys)[keyof typeof LocalStorageKeys]
+
+type UpdateEventPayload = {
+  key: string
 }
 
-type KeyValue = (typeof LocalStorageKeys)[keyof typeof LocalStorageKeys]
+export class StorageUpdateEvent extends CustomEvent<UpdateEventPayload> {
+  static type: keyof WindowEventMap = "rsseditor:storage-update" as const
+
+  constructor(payload: UpdateEventPayload) {
+    super(StorageUpdateEvent.type, { detail: payload })
+  }
+}
 
 export default function useLocalStorage<T extends Storable>(
   key: KeyValue,
   initialValue: T
-): [T, React.Dispatch<React.SetStateAction<T>>] {
-  const [value, setValue] = useState(() => {
-    if (!window.localStorage) return initialValue
+): [T, (newValue: T) => void] {
+  const currentStoredItem = useSyncExternalStore(
+    (callback) => {
+      const listener = (evt: StorageUpdateEvent) => {
+        if (evt.detail.key === key) callback()
+      }
 
-    const currentValue = localStorage.getItem(key)
-    return currentValue
-      ? coerce<T>(currentValue, { fallback: initialValue })
-      : initialValue
-  })
+      window.addEventListener("rsseditor:storage-update", listener)
+      return () => {
+        window.removeEventListener("rsseditor:storage-update", listener)
+      }
+    },
+    () => localStorage.getItem(key)
+  )
 
-  useEffect(() => {
-    if (window.localStorage) {
+  const setStoredValue = useCallback(
+    (value: T) => {
       localStorage.setItem(key, JSON.stringify(value))
-    }
-  }, [key, value])
+      window.dispatchEvent(new StorageUpdateEvent({ key }))
+    },
+    [key]
+  )
 
-  return [value, setValue]
+  const value: T = currentStoredItem
+    ? JSON.parse(currentStoredItem)
+    : initialValue
+
+  return [value, setStoredValue]
 }

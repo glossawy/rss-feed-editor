@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect } from "react"
+import { createContext, useContext } from "react"
 
 import useLocalStorage from "@app/hooks/localStorage"
 import { LocalStorageKeys } from "@app/utils/defaults"
@@ -92,18 +92,13 @@ export const useFeedTransform = () => useContext(FeedTransformContext)
 export const useFeedTransformDispatch = () =>
   useContext(FeedTransformDispatchContext)
 
-export const useStoredFeedTransform = (
+export function useStoredFeedTransform(
   initial: FeedTransform
-): [FeedTransform, React.Dispatch<React.SetStateAction<FeedTransform>>] => {
+): [FeedTransform, (newValue: FeedTransform) => void] {
   const [storedFeedTransform, setStoredFeedTransform] = useLocalStorage(
     LocalStorageKeys.feedTransform,
     initial
   )
-
-  // Runs migrations if needed exactly once on mount
-  useEffect(() => {
-    setStoredFeedTransform(migrate(storedFeedTransform))
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return [migrate(storedFeedTransform), setStoredFeedTransform]
 }
